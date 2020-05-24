@@ -1,37 +1,34 @@
 
-//GAUGE
-const gaugeElement = document.querySelector(".gauge");
 
-function setGaugeValue(gauge, value) {
-  if (value < 0 || value > 1) {
+//===========GAUGES=================================================================
+
+const gaugeBattery = document.querySelector('.battery');
+const gaugePressure = document.querySelector('.pressure');
+const gaugeTemperature = document.querySelector('.temperature');
+
+function setGaugeValueB(gauge,value) {
+  if(value<0||value>1) {
     return;
   }
-
-  gauge.querySelector(".gauge__fill").style.transform = `rotate(${
-    value / 2
-  }turn)`;
-  gauge.querySelector(".gauge__cover").textContent = `${Math.round(
-    value * 100
-  )}%`;
+  gauge.querySelector(".battery__fill").style.transform = `rotate(${value/2}turn)`;
+  gauge.querySelector(".battery__cover").textContent = `${Math.round(value*100)}%`;
 }
 
-setGaugeValue(gaugeElement, 0.75);
-
-
-
-//CHART
-getData();
-
-async function getData() {
-  const response = await fetch('globalTemp.csv');
-  const data = await response.text();
-
-  const rows = data.split('\n').slice(1);
-  rows.forEach(ele => {
-      const row = ele.split(',');
-      const year = row[0];
-      const temp = row[1];
-      console.log(year);
-      console.log(temp);
-  });
+function setGaugeValueP(gauge,value) {
+  if(value<0||value>1) {
+    return;
+  }
+  gauge.querySelector(".pressure__fill").style.transform = `rotate(${value/2}turn)`;
+  gauge.querySelector(".pressure__cover").textContent = `${Math.round(value*100)}Pa`;
 }
+
+function setGaugeValueT(gauge,value) {
+  if(value<0||value>1) {
+    return;
+  }
+  gauge.querySelector(".temp__fill").style.transform = `rotate(${value/2}turn)`;
+  gauge.querySelector(".temp__cover").textContent = `${Math.round(value*100)}°C`;
+}
+
+
+

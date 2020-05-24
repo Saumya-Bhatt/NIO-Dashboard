@@ -55,12 +55,12 @@ body {
 }
 
 header {
-    font-size: 3em;
+    font-size: 2.8em;
     font-family: sans-serif;
     margin: 0px;
     background-color: teal;
     color: white;
-    padding: 10px 20px;
+    padding: 10px 30px;
 }
 
 .sub__title {
@@ -71,28 +71,97 @@ header {
 
 .container {
     background-color: #242424;
-    margin: 20px 50px;
+    margin: 20px 20px;
     border-radius: 15px;
+    width: inherit;
 }
 .heading {
     background-color: lightseagreen;
-    padding: 1px 40px;
+    padding: 0.5px 40px;
     color: white;
-    font-size: 1.2em;
+    font-size: 1em;
     font-family: sans-serif;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
 }
 .element {
-    width: 50%;
-    margin: 20px 0px;
+    margin: 10px auto;
     text-align: center;
-    padding: 20px 10px;
+    padding: 15px 10px 5px 10px;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
-.battery p {
+.zone p {
     font-size: 1.2em;
     font-family: sans-serif;
     color: lightseagreen;
+}
+.grid-wrapper
+{
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+.panel {
+    width: 400px;
+}
+.video {
+    width: 600px;
+}
+.command {
+    width: 350px;
+}
+.btn {
+    background-color: #1f1f1f;
+    color: lightseagreen;
+    padding: 20px;
+    height: 70px;
+    width: 70px;
+    border: 1px solid turquoise;
+    border-radius: 10px;
+}
+.btn :hover {
+    cursor: pointer;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-gap: 10px;
+    padding: 10px;
+}
+
+.item1 {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+.item2 {
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+.item3 {
+    grid-column-start: 3;
+    grid-column-end: 4;
+}
+.item4 {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+.item5 {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+.cmd_list {
+    list-style: none;
+    font-family: monospace;
+    padding: 10px 10px;
+}
+.cmd_list button {
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    text-align: center;
+    border-radius: 10px;
+    background-color: teal;
+    width: 100%;
+
 }

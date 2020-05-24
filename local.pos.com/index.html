@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiving Panel</title>
+</head>
+<body>
+    <h1>Receving Panel</h1><br>
+    <div>
+        <h3>command Received:</h3>
+        <input readonly id="cmd_area">
+    </div>
+</body>
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+<script>
+    var preresp = '';
+    function getData() {
+        $.ajax({
+            url: 'http://local.pos.com:5000/server.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response,status,http) {
+                if(response != preresp) {
+                    var dat1 = response.split('[');
+                    var dat2 = dat1[1].split(']');
+                    var foo = JSON.parse(dat2[0]);
+                    console.log(foo.cmd);
+
+                    $('#cmd_area').val(foo.cmd + '\n');
+
+                    preresp = response;
+                } else {
+                    return;
+                }
+            },
+            error: function(http,status,error) {
+                console.log(error);
+                alert('ERROR: ')+error;
+            }
+        });
+    }
+    getData();
+
+    setInterval(getData, 500);
+</script>

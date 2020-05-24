@@ -10,25 +10,233 @@
 <body>
     <header>Marine Underwater Bot - Dashboard</header>
     <div class="sub__title">National Institute of Oceanography, Goa</div>
+
     <div class="container">
+
         <div class="heading">
             <p>Current bot status</p>
         </div>
-        <div class="element">
-            <div class="battery">
-                <div class="gauge">
-                    <div class="gauge__body">
-                        <div class="gauge__fill"></div>
-                        <div class="gauge__cover"></div>
+
+        <div class="element grid-wrapper">
+
+            <div class="zone" style="text-align: justify; color: aqua; font-family: sans-serif; padding: 30px;">
+                DATA LOG: <br><br>
+                Day : <span id="day"></span><br><br>
+                Time : <span id="time"></span>
+            </div>
+
+            <div class="zone">
+                <div class="gauge battery">
+                    <div class="gauge__body battery__body">
+                        <div class="gauge__fill battery__fill"></div>
+                        <div class="gauge__cover battery__cover"></div>
                     </div>
                 </div>
                 <p>Battery Status:</p>
-            </div> 
+            </div>
+
+            <div class="zone">
+                <div class="gauge pressure">
+                    <div class="gauge__body pressure__body">
+                        <div class="gauge__fill pressure__fill"></div>
+                        <div class="gauge__cover pressure__cover"></div>
+                    </div>
+                </div>
+                <p>Pressure Status:</p>
+            </div>
+
+            <div class="zone">
+                <div class="gauge temperature">
+                    <div class="gauge__body temp__body">
+                        <div class="gauge__fill temp__fill"></div>
+                        <div class="gauge__cover temp__cover"></div>
+                    </div>
+                </div>
+                <p>Outside Temperature:</p>
+            </div>
+
         </div>
+
     </div>
+
+    <div style="display: flex;">
+
+        <div class="container panel">
+
+            <div class="heading">
+                <p>Control Panel</p>
+            </div>
+    
+            <div class="grid-container element" style="margin: 20px 80px;">
+                <button class="btn item1">Up</button>
+                <button class="btn item2">Left</button>
+                <button class="btn item5">°</button>
+                <button class="btn item3">Right</button>
+                <button class="btn item4">Down</button>
+            </div>
+    
+        </div>
+    
+        <div class="container video">
+    
+            <div class="heading">
+                <p>Live Feed</p>
+            </div>
+
+            <div>
+                <video id="video" src="http://localhost:80" autoplay="autoplay" width="videowidth" height="videoheight"></video>
+            </div>
+    
+        </div>
+ 
+        <div class="container command">
+
+            <div class="heading">
+                <p>Command Panel</p>
+            </div>
+
+            <div class="cmd_list">
+                <button onclick="start()" style="background-color: darkseagreen;">S T A R T</button>
+                <button onclick="cmdA()">C O M M A N D  A</button>
+                <button onclick="cmdB()">C O M M A N D  B</button>
+                <button onclick="cmdC()">C O M M A N D  C</button>
+                <button onclick="stop()" style="background-color: indianred;">S T O P</button>
+            </div>
+
+        </div>
+
+    </div>
+    
 
 
     <script src="script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+
 
 </body>
 </html>
+
+<script>
+
+    $.ajax({
+        url:'http://localhost/NIO/globalTemp.json',
+        data: 'GET',
+        dataType: ' json',
+        success: function(response,status,http) {
+            const numb = response[27]['Glob'];
+            const valb = numb.split('-.');
+            const battery = valb[1]/100;
+
+            const nump = response[17]['Glob'];
+            const valp = nump.split('-.');
+            const pressure = valp[1]/100;
+
+            const numt = response[45]['Glob'];
+            const valt = numt.split('-.');
+            const temp = valt[1]/100;           
+
+            //setGaugeValue(gaugeElement, battery);
+            setGaugeValueB(gaugeBattery,battery);
+            setGaugeValueP(gaugePressure,pressure);
+            setGaugeValueT(gaugeTemperature,temp);
+        },
+    });
+
+    function time(){
+    var date = new Date();    
+    var time = date.toLocaleTimeString();
+    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    var day = date.toLocaleDateString('en-US',options);
+    document.getElementById('time').innerHTML = time;
+    document.getElementById('day').innerHTML = day;
+    }
+    setInterval(function(){
+    time();
+    },1000);
+
+var clickcount = 0;
+
+function start() {
+    var insertLog = 'START';
+    clickcount += 1;
+    $.ajax({
+        url: "http://localhost/NIO/server.php",
+        type: "POST",
+        data: 'command_log='+insertLog,
+        dataType: 'text',
+        success: function(response,status,http) {
+            console.log('connection made');
+        },
+        error: function(http,status,error) {
+            alert('ERROR: '+error);
+        }
+    })
+}    
+function cmdA() {
+   var insertLog = 'CMD-A clicked';
+   clickcount += 1;
+    $.ajax({
+        url: "http://localhost/NIO/server.php",
+        type: "POST",
+        data: 'command_log='+insertLog,
+        dataType: 'text',
+        success: function(response,status,http) {
+            console.log('connection made');
+        },
+        error: function(http,status,error) {
+            alert('ERROR: '+error);
+        }
+    });
+}
+function cmdB() {
+    var insertLog = 'CMD-B clicked';
+    clickcount += 1;
+    $.ajax({
+        url: "http://localhost/NIO/server.php",
+        type: "POST",
+        data: 'command_log='+insertLog,
+        dataType: 'text',
+        success: function(response,status,http) {
+            console.log('connection made');
+        },
+        error: function(http,status,error) {
+            alert('ERROR: '+error);
+        }
+    })
+}
+function cmdC() {
+    var insertLog = 'CMD-C clicked';
+    clickcount += 1;
+    $.ajax({
+        url: "http://localhost/NIO/server.php",
+        type: "POST",
+        data: 'command_log='+insertLog,
+        dataType: 'text',
+        success: function(response,status,http) {
+            console.log('connection made');
+        },
+        error: function(http,status,error) {
+            alert('ERROR: '+error);
+        }
+    })
+}
+function stop() {
+    var insertLog = 'STOP';
+    clickcount += 1;
+    $.ajax({
+        url: "http://localhost/NIO/server.php",
+        type: "POST",
+        data: 'command_log='+insertLog,
+        dataType: 'text',
+        success: function(response,status,http) {
+            console.log('connection made');
+        },
+        error: function(http,status,error) {
+            alert('ERROR: '+error);
+        }
+    })
+}
+
+
+</script>
