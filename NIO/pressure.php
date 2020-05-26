@@ -3,7 +3,7 @@
     $data = $_REQUEST;
 
     $con = mysqli_connect('localhost','root','','command_log');
-    $query = 'SELECT cmd FROM log ORDER BY id DESC limit 1';
+    $query = 'SELECT pascal FROM pressureupdate ORDER BY id DESC limit 1';
     $getdata = mysqli_query($con,$query);
 
     $row_count = mysqli_num_rows( $getdata );
@@ -20,5 +20,3 @@
     print($command);
 
 ?>
-
-

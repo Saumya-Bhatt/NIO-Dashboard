@@ -9,7 +9,10 @@
     <h1>Receving Panel</h1><br>
     <div>
         <h3>command Received:</h3>
-        <input readonly id="cmd_area">
+        <input readonly id="cmd_area"><br>
+        <h3>Battery input:</h3><input onkeyup="batteryUpdate()" type="text" id="battery"><br>
+        <h3>Pressure Status:</h3><input onkeyup="pressureUpdate()" type="text" id="pressure"><br>
+        <h3>Temperature Status:</h3><input onkeyup="temperatureUpdate()" type="text" id="temperature"><br>
     </div>
 </body>
 </html>
@@ -17,6 +20,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 
 <script>
+
     var preresp = '';
     function getData() {
         $.ajax({
@@ -45,6 +49,54 @@
         });
     }
     getData();
-
     setInterval(getData, 500);
+
+    function batteryUpdate() {
+        var battery = document.getElementById('battery').value;
+        $.ajax({
+            url: 'http://local.pos.com:5000/battery.php',
+            data: 'battery='+battery,
+            dataType: 'text',
+            type: 'POST',
+            success: function(response,status,http) {
+                console.log('Connection made');
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    }
+
+    function pressureUpdate() {
+        var pressure = document.getElementById('pressure').value;
+        $.ajax({
+            url: 'http://local.pos.com:5000/pressure.php',
+            data: 'pressure='+pressure,
+            dataType: 'text',
+            type: 'POST',
+            success: function(response,status,http) {
+                console.log('Connection made');
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    }
+
+    function temperatureUpdate() {
+        var temperature = document.getElementById('temperature').value;
+        $.ajax({
+            url: 'http://local.pos.com:5000/temperature.php',
+            data: 'temperature='+temperature,
+            dataType: 'text',
+            type: 'POST',
+            success: function(response,status,http) {
+                console.log('Connection made');
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    }
+
 </script>
