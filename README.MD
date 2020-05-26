@@ -5,7 +5,7 @@ The dashboard can send commands to the receiving pannel which get's updated in r
 ![Dashboard Screenshot](Screenshots/dashboard_SS.png)
 This is how the dashboard looks. The commands can be specified later for various use. Gauges are updated by the data sent from the receive panel in realtime.
 
-![Receive Panel](Screemshots/receive_SS.png)
+![Receive Panel](Screenshots/receive_SS.png)
 This is a temporary page made so as to immitate the receiver side. Can later be replaced by a practical model. This is for representation purposes.
 
 ## Server settings
