@@ -1,0 +1,314 @@
+body {
+    margin: 0;
+    background-color: #1f1f1f;
+}
+input {
+    background-color: darkslategrey;
+    border: none;
+    height: 2em;
+    color: darkturquoise;
+    cursor: initial;
+}
+button {
+    cursor: pointer;
+}
+
+
+
+/*======= HEADER DISPLAY =======*/
+.heading {
+    background-color: #008080;
+}
+.heading header {
+    background-color: #008b8b;
+    padding: 5px 20px;
+    color: whitesmoke;
+    font-size: 3em;
+}
+.heading p {
+    padding: 5px 20px;
+    color: whitesmoke;
+}
+.time {
+    display: flex;
+}
+.time p {
+    margin-left:20px;
+    margin-right: 20px;
+}
+.subheading {
+    display: flex;
+}
+.time p > span {
+    margin-left: 10px;
+}
+
+
+
+/*======= CONTAINER SETTINGS =======*/
+.container {
+    display: flex;
+    padding: 10px;
+}
+.column {
+    width: 25%;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 20px;
+    font-family: sans-serif;
+}
+.sensor, .camera, .mission_command, .test_command, .gauges_row, .coordinates, .map, .map_command{
+    background-color: #242424;
+    border: lightslategray;
+    padding: 15px;
+    margin: 15px auto;
+    border-radius: 5px;
+    color: aquamarine;
+}
+
+
+
+/*======= COLUMN A SETTINGS =======*/
+.connect {
+    display: flex;
+}
+#connect {
+    padding: 15px 25px;
+    width: 80%;
+}
+#connect_status {
+    height: 50px;
+    width: 55px;
+    border-radius: 50%;
+    background-color: #101010;
+    border: 2px solid #303030;
+    margin:auto 30px;
+}
+#sensor_request, #camera_request {
+    margin: auto 30px;
+    padding: 10px;
+    width: 60%;
+    border-radius: 5px;
+    border: 2px solid #484848;
+}
+#par_value {
+    width: 70%;
+    margin-left: 10px;
+}
+.ctd_consol {
+    display: flex;
+}
+.ctd_field {
+    display: flex;
+}
+.ctd_field input {
+    width: 20%;
+    margin: auto 10px;
+}
+.camera textarea {
+    width: 95%;
+    background-color: black;
+}
+#last_mission {
+    width: 100%;
+    padding: 20px auto;
+    height: 3em;
+}
+
+
+
+/*======= COLUMN B SETTINGS ======*/
+.status_key p {
+    color: aquamarine;
+}
+.mission_command button, .test_command button{
+    width: 80%;
+    margin: 15px 20px;
+    padding: 7px;
+}
+#load_mission, #execute_mission, #abort_mission {
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid #484848;
+}
+
+
+
+/*======= COLUMN C SETTINGS =======*/
+.coordinates {
+    display: flex;
+    margin-bottom: 0px;
+}
+.coordinates input {
+    width: 45%;
+    margin: auto 10px;
+}
+.gauges_row {
+    display: flex;
+}
+.element {
+    margin: auto 10px;
+}
+.level_gauge {
+    display: inline;
+}
+.level_coordi {
+    display: flex;
+}
+.level_coordi input {
+    width: 40%;
+    margin: auto 5px;
+}
+#battery_percent, #compass_yaw {
+    width: 50%;
+}
+.map_control {
+    display: flex;
+    margin-top: 10px;
+}
+.map_command {
+    width: 20%;
+}
+.boat_coordinates p {
+    font-size: 14px;
+}
+.map {
+    width: 60%;
+}
+
+
+
+/*======= BATTERY GAUGE BODY =======*/
+.battery_status {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+}
+.battery_cap {
+    width: 30px;
+    height: 3px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: lightseagreen;
+    border: 2px solid lightseagreen;
+}
+
+
+
+
+
+/*======= COMPASS GAUGE BODY =======*/
+.compass_status {
+    border: none;
+    background-color: black;
+    height: 130px;
+    width: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px solid grey;
+}
+.dial {
+    height: 115px;
+    width: 115px;
+    border-radius: 50%;
+    background-color: whitesmoke;
+    position: relative;
+}
+.dial_fill {
+    position: absolute;
+    height: 3px;
+    width: 100px;
+    background: linear-gradient(to right, red, black);
+    transform-origin: center top;
+    transform: rotate(-0.2turn);
+    transition: transform 0.2s ease-out;
+}
+.compass_dial {
+    width: inherit; 
+    height: inherit; 
+    border-radius: 50%;
+}
+
+
+
+/*======= LEVEL GAUGE DIAL =======*/
+.level_status {
+    height: 125px;
+    width: 125px;
+    background-color: rgb(196, 124, 62);
+    margin: auto;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 5px solid #181818;
+    position: relative;
+    overflow: hidden;
+}
+.level_bg {
+    height: 130px;
+    width: 130px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    position: absolute;
+    z-index: 9;
+}
+/*.level_body {
+    height: 115px;
+    width: 115px;
+    border-radius: 50%;
+    background-color: sandybrown;
+    position: absolute;
+    overflow: hidden;
+    z-index: 999;
+}*/
+.level_cover {
+    width: 140%;
+    height: 100%;
+    top: -50%;
+    left: -20%;
+    background-color: cadetblue;
+    position: absolute;
+    transform-origin: center bottom;
+    transform: rotate(0.033turn);
+    transition: transform 0.2s ease-out;
+    z-index: 99;
+}
+.level_line {
+    width: inherit;
+    height: 1px;
+    background-color: whitesmoke;
+    border: none;
+    position: absolute;
+    z-index: 999;
+}
+
+
+
+/*======= MAP SETTINGS ======*/
+.red_dot, .blue_dot, .green_dot {
+    font-size: 2em;
+    margin-right: 5px;
+}
+.red_dot {
+    color: red;
+}
+.blue_dot {
+    color: blue;
+}
+.green_dot {
+    color: chartreuse;
+}
+.map_index li{
+    font-size: 0.6em;
+}
+.map_index {
+    background-color: rgba(#000, #000, #000, 0.3);
+    border: none;
+    border-radius: 10px;
+    float: right;
+    margin-top: 0px;
+}

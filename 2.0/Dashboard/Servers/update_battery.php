@@ -1,10 +1,9 @@
 <?php
 
     $data = $_REQUEST;
-
-    $con = mysqli_connect('localhost','root','','command_log');
-    $query = 'SELECT percent FROM batteryupdate ORDER BY id DESC limit 1';
-    $getdata = mysqli_query($con,$query);
+    $con = mysqli_connect('localhost','root','','dashboard');
+    $getlatest = 'SELECT percent FROM send_battery ORDER BY id DESC limit 1';
+    $getdata = mysqli_query($con,$getlatest);
 
     $row_count = mysqli_num_rows( $getdata );
     $arr = array();

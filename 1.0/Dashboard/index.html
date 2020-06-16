@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>Marine Underwater Bot - Dashboard</header>
-    <div class="sub__title">Institution Heading</div>
+    <div class="sub__title">National Institute of Oceanography, Goa</div>
 
     <div class="container">
 
@@ -145,7 +145,7 @@
 
     function updateBattery() {
         $.ajax({
-            url:'http://localhost/NIO/battery.php',
+            url:'http://localhost/NIO/1.0/Dashboard/battery.php',
             data: '',
             type: 'GET',
             dataType:'text',
@@ -166,7 +166,7 @@
 
     function updatePressure() {
         $.ajax({
-            url:'http://localhost/NIO/pressure.php',
+            url:'http://localhost/NIO/1.0/Dashboard/pressure.php',
             data: '',
             type: 'GET',
             dataType:'text',
@@ -187,7 +187,7 @@
 
     function updateTemperature() {
         $.ajax({
-            url:'http://localhost/NIO/temperature.php',
+            url:'http://localhost/NIO/1.0/Dashboard/temperature.php',
             data: '',
             type: 'GET',
             dataType:'text',
@@ -225,7 +225,7 @@ function start() {
     var insertLog = 'START';
     clickcount += 1;
     $.ajax({
-        url: "http://localhost/NIO/server.php",
+        url: "http://localhost/NIO/1.0/Dashboard/server.php",
         type: "POST",
         data: 'command_log='+insertLog,
         dataType: 'text',
@@ -241,7 +241,7 @@ function cmdA() {
    var insertLog = 'CMD-A clicked';
    clickcount += 1;
     $.ajax({
-        url: "http://localhost/NIO/server.php",
+        url: "http://localhost/NIO/1.0/Dashboard/server.php",
         type: "POST",
         data: 'command_log='+insertLog,
         dataType: 'text',
@@ -257,7 +257,7 @@ function cmdB() {
     var insertLog = 'CMD-B clicked';
     clickcount += 1;
     $.ajax({
-        url: "http://localhost/NIO/server.php",
+        url: "http://localhost/NIO/1.0/Dashboard/server.php",
         type: "POST",
         data: 'command_log='+insertLog,
         dataType: 'text',
@@ -273,7 +273,7 @@ function cmdC() {
     var insertLog = 'CMD-C clicked';
     clickcount += 1;
     $.ajax({
-        url: "http://localhost/NIO/server.php",
+        url: "http://localhost/NIO/1.0/Dashboard/server.php",
         type: "POST",
         data: 'command_log='+insertLog,
         dataType: 'text',
@@ -289,7 +289,7 @@ function stop() {
     var insertLog = 'STOP';
     clickcount += 1;
     $.ajax({
-        url: "http://localhost/NIO/server.php",
+        url: "http://localhost/NIO/1.0/Dashboard/server.php",
         type: "POST",
         data: 'command_log='+insertLog,
         dataType: 'text',

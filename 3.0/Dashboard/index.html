@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Dashboard</title>
+</head>
+<body>
+    <div class="heading">
+        <!--<header>Marine Underwater Bot Dashboard</header>-->
+        <div class="subheading">
+            <p>CSIR, National Institute of Oceanography, Goa</p>
+            <div class="time">
+                <p>Date:    <span id="day"></span></p>
+                <p>Time:    <span id="time"></span></p>
+            </div>
+        </div>
+    </div>
+ 
+    <div class="container">
+
+        <div class="column">
+            <div class="connect">
+                <button id="connect" onclick="connect_command()">Connect</button>
+                <span id="connect_status"></span>
+            </div>
+            <div class="sensor">
+                <p>Sensor: <button onclick="sensor_command()" id="sensor_request">Request</button></p>
+                <P>PAR: <span style="margin-left: 20px;" id="PAR"></span></P>
+                <div class="ctd_consol">
+                    <p>CTD:<span style="margin-left: 20px;" id="CTD"></span></p>
+                </div>
+            </div>
+            <div class="camera">
+                <p>Camera: <button onclick="camera_connect()" id="camera_request">Request</button></p>
+                <textarea name="camera_view" id="camera_view" cols="30" rows="12"></textarea>
+            </div>
+            <div class="download">
+                <br>
+                <div id="download"></div>
+                <!--<button onclick="download_mission()" id="last_mission">Download last mission data</button>-->
+            </div>
+        </div>
+
+        <div class="column" style="width: 18%;">
+            <div class="status_key">
+                <!--<p><span style="color: greenyellow;">Green</span>: Radio</p>
+                <p><span style="color: lightsalmon;">Orange</span>: Acoustic</p>
+                <p><span style="color: tomato;">Red</span>: No connection</p>-->
+                <div id="command_status" style="color: white; background-color: black; padding: 10px 15px; font-size: 15px; font-family: monospace;"></div>
+            </div>
+            <div class="mission_command">
+                <form action="Servers/load_mission.php" method="POST" enctype="multipart/form-data">
+    
+                    <input style="background-color: none;" type="file" name="file" id="file"><br>
+                    <button type="submit" onclick="cli_load_mission()" value="SEND">Load Mission</button>
+            
+                </form>
+            </div>
+            <div class="mission_command">
+                <button onclick="execute_mission()" id="execute_mission">Execute Mission</button><br>
+                <button onclick="abort_mission()" id="abort_mission">Abort Mission</button>
+            </div>
+            <div class="test_command">
+                <button onclick="builtin_test()" id="builtin_test">Built-in Test</button>
+                <button onclick="compass()" id="compass">Compass Caliberation</button>
+                <button onclick="safety_test()" id="safety_test">Safety Test</button>
+            </div>
+        </div>
+
+        <div class="column" style="width: 40%;">
+            <div class="gauges_row">
+                <div class="element battery_gauge" style="width: 200px;">
+                    <div class="battery_status">
+                        <div class="battery_cap"></div>
+                        <div class="batterybody" style="height: 100px; width: 50px; background-color: lightseagreen; position: relative; margin: 2px solid #141414;">
+                            <div id="batteryfill" style=" width: 44px; background-color: #242424; position: absolute;  margin-left: 3px; margin-top: 3px;"></div>
+
+                        </div>
+                    </div><br><br>
+                    <p id="battery_percent"></p>
+                </div>
+                <div class="element compass_gauge">
+                    <div class="compass_status">
+                        <div class="dial"><img class="compass_dial" src="Images/compass.png" alt=""></div>
+                        <div class="dial_fill"></div>
+                    </div>
+                    <p id="compass_yaw"></p>
+                </div>
+                <div class="element level_gauge">
+                    <div class="level_status">
+                        <div class="level_bg"></div>
+                        <div class="level_body"></div>
+                        <div class="level_cover"></div>
+                        <div class="level_line"></div>               
+                    </div>
+                    <div class="level_coordi">
+                        <p>Pitch : <input type="text" id="pitch" readonly></p>
+                        <p>Roll: <input type="text" id="roll" readonly></p>
+                    </div>
+                </div>
+            </div>
+            <div class="coordinates">
+                <p id="depth" style="margin-right: 80px;"></p>
+                <p id="latitude"" style="margin-right: 80px;"></p>
+                <p id="longitude"></p>
+            </div>
+            <div class="map_control">
+                <div class="map">MAP
+                    <ul class="map_index" style="list-style: none;">
+                        <li><span class="red_dot">•</span>C-Bot Position</li>
+                        <li><span class="blue_dot">•</span>Boat Position</li>
+                        <li><span class="green_dot">•</span>Home Position</li>
+                    </ul>
+                </div>            
+                <div class="map_command">
+                    <button onclick="user_position()" id="scan_map">User Position Scan GPS Port</button>
+                    <div class="boat_coordinates">
+                        <p>Lat Long of Boat: <input style="width:100%; margin-top:5px" type="text" id="boat_coordi" readonly></p>
+                        <p>Range to C-Bot: <input style="width:100%; margin-top:5px" type="text" id="cbot_range" readonly></p>
+                        <p>Bearing to C-Bot: <input style="width:100%; margin-top:5px" type="text" id="cbot_bearing" readonly></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="script.js"></script>
+
+<script>
+    //======= CONNECTION COMMAND =======
+    function connect_command() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/command.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to command.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+    //======= SENSOR COMMAND =======
+    function sensor_command() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/sensor.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to sensor.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+    //======= CAMERA COMMAND =======
+    function camera_connect() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/camera.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to camera.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+
+
+    //======= UPDATE LOAD MISSION CLI =======
+    function cli_load_mission() {
+        $.ajax({
+            url: 'http://localhost/NIO/3.0/Dashboard/Servers/execute_mission.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                var file1 = response.split('[');
+                var file2 = file1[1].split(']');
+                var file3 = JSON.parse(file2[0]);
+                var file = file3.msg;
+                var test = file.split('/');
+                var div = document.getElementById('command_status').innerHTML = `Loaded : `+test[6];
+
+                document.getElementById('download').innerHTML =  `<a href="../UPLOAD/`+test[6]+`" download style='    
+                                                                    color: black;
+                                                                    background-color: darkgray;
+                                                                    padding: 10px 20px;
+                                                                    border-radius: 5px;
+                                                                    text-decoration: none;'
+                                                                    >Download Last Mission file</a>`;
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+    cli_load_mission();
+
+
+
+    //======= ABORT MISSION COMMAND =======
+    function abort_mission() {
+        $.ajax({
+            url: 'http://localhost/NIO/3.0/Dashboard/Servers/execute_mission.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                var file1 = response.split('[');
+                var file2 = file1[1].split(']');
+                var file3 = JSON.parse(file2[0]);
+                var file = file3.msg;
+                var test = file.split('/');
+                var div = document.getElementById('command_status').innerHTML = `Aborted : `+test[6];
+                $.ajax({
+                    url: 'http://localhost/NIO/3.0/Dashboard/Servers/abort_mission.php',
+                    type: 'GET',
+                    data: 'file_path='+file,
+                    dataType: 'text',
+                    success: function(response, status, http) {
+                        console.log('file aborted');
+                    },
+                    error: function(http, status, error) {
+                        alert('ERROR :'+error);
+                    }
+                });
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+
+    }
+
+    //======= BUILT-IN TEST COMMAND =======
+    function builtin_test() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/builtin_test.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to builtin_test.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+    //======= COMPASS CALIBERATION COMMAND =======
+    function compass() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/compass.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to compass.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+    //======= SAFETY TEST COMMAND =======
+    function safety_test() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/safety_test.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to safety_test.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+    //======= USER POSITION COMMAND =======
+    function user_position() {
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/user_position.php',
+            type: 'GET',
+            data: '',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log('Connection to user_position.php made!');
+            },
+            error: function(http, status, error) {
+                alert('ERROR: '+error);
+            },
+        })
+    }
+
+    //======= UPDATE BATTERY STATUS =======
+    function updateBattery() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_battery.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var bat1 = response.split('[');
+                var bat2 = bat1[1].split(']');
+                var bat3 = JSON.parse(bat2[0]);
+                var batpercent = bat3.percent;
+                document.getElementById('battery_percent').innerHTML = 'Battery:'+batpercent+'%';
+                console.log(batpercent);
+                if(batpercent == null) {
+                    var fill = document.getElementById('batteryfill').style.height = `100px`;
+                }
+                var fill = document.getElementById('batteryfill').style.height = `${100-batpercent}px`;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updateBattery();
+    setInterval(updateBattery,500);
+
+    //======= UPDATE YAW =======
+    function updateYaw() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_yaw.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var yaw1 = response.split('[');
+                var yaw2 = yaw1[1].split(']');
+                var yaw3 = JSON.parse(yaw2[0]);
+                var yaw_val = yaw3.val;
+                console.log(yaw_val);
+                document.querySelector('.dial_fill').style.transform = `rotate(${yaw_val/1000}turn)`;
+                document.getElementById('compass_yaw').innerHTML = 'Yaw : '+yaw_val;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updateYaw();
+    setInterval(updateYaw,500);
+
+    //======= UPDATE STATUS =======
+    function updateStatus() {
+        var getStatusID = document.getElementById('connect_status')
+        $.ajax({
+            url: 'http://localhost/NIO/2.0/Dashboard/Servers/update_status.php',
+            data: '',
+            type: 'GET',
+            dataType: 'text',
+            success: function(response, status, http) {
+                console.log(response);
+                if(response == 'green') {
+                    getStatusID.style.backgroundColor = `greenyellow`;
+                } else if(response == 'orange') {
+                    getStatusID.style.backgroundColor = `lightsalmon`;
+                } else if(response == 'red') {
+                    getStatusID.style.backgroundColor = `tomato`;
+                } else if(response == null) {
+                    getStatusID.style.backgroundColor = `#141414`;
+                }
+            },
+            error: function(http, status, error) {
+                alert('ERROR :'+error);
+            },
+        })
+    }
+    updateStatus();
+    setInterval(updateStatus,500);
+
+    //======= UPDATE DEPTH =======
+    function updateDepth() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_depth.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var depth1 = response.split('[');
+                var depth2 = depth1[1].split(']');
+                var depth3 = JSON.parse(depth2[0]);
+                var depth_val = depth3.val;
+                console.log(depth_val);
+                document.getElementById('depth').innerHTML = `Depth :  `+ depth_val + ` ft`;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updateDepth();
+    setInterval(updateDepth,500);
+
+    //======= UPDATE LATITUDE =======
+    function updateLat() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_latitude.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var lat1 = response.split('[');
+                var lat2 = lat1[1].split(']');
+                var lat3 = JSON.parse(lat2[0]);
+                var lat_val = lat3.val;
+                console.log(lat_val);
+                document.getElementById('latitude').innerHTML = `Latitude :  `+ lat_val + ` °N`;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updateLat();
+    setInterval(updateLat,500);
+
+    //======= UPDATE LONGITUDE =======
+    function updateLong() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_longitude.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var long1 = response.split('[');
+                var long2 = long1[1].split(']');
+                var long3 = JSON.parse(long2[0]);
+                var long_val = long3.val;
+                console.log(long_val);
+                document.getElementById('longitude').innerHTML = `Longitude :  `+ long_val + ` °E`;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updateLong();
+    setInterval(updateLong,500);
+
+    //======= UPDATE PAR VALUE =======
+    function updatePAR() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_PAR.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var par1 = response.split('[');
+                var par2 = par1[1].split(']');
+                var par3 = JSON.parse(par2[0]);
+                var par_val = par3.PAR;
+                console.log(par_val);
+                document.getElementById('PAR').innerHTML = par_val;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updatePAR();
+    setInterval(updatePAR,500);
+
+    //======= UPDATE CTD VALUE =======
+    function updateCTD() {
+        $.ajax({
+            url:'http://localhost/NIO/2.0/Dashboard/Servers/update_CTD.php',
+            data: '',
+            type: 'GET',
+            dataType:'text',
+            success: function(response,status,http) {
+                var ctd1 = response.split('[');
+                var ctd2 = ctd1[1].split(']');
+                var ctd3 = JSON.parse(ctd2[0]);
+                var ctd_val = ctd3.CTD;
+                console.log(ctd_val);
+                document.getElementById('CTD').innerHTML = ctd_val;
+            },
+            error: function(http,status,error) {
+                alert('ERROR: '+error);
+            }
+        })
+    };
+    updateCTD();
+    setInterval(updateCTD,500);
+
+
+</script>

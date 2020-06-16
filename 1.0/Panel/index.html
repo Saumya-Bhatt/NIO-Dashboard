@@ -16,7 +16,7 @@
     </div>
 </body>
 </html>
-
+ 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 
 <script>
@@ -24,7 +24,7 @@
     var preresp = '';
     function getData() {
         $.ajax({
-            url: 'http://local.pos.com:5000/server.php',
+            url: 'http://localhoast/NIO/1.0/Panel/server.php',
             type: 'GET',
             data: '',
             dataType: 'text',
@@ -54,7 +54,7 @@
     function batteryUpdate() {
         var battery = document.getElementById('battery').value;
         $.ajax({
-            url: 'http://local.pos.com:5000/battery.php',
+            url: 'http://localhoast/NIO/1.0/Panel/battery.php',
             data: 'battery='+battery,
             dataType: 'text',
             type: 'POST',
@@ -70,7 +70,7 @@
     function pressureUpdate() {
         var pressure = document.getElementById('pressure').value;
         $.ajax({
-            url: 'http://local.pos.com:5000/pressure.php',
+            url: 'http://localhoast/NIO/1.0/Panel/pressure.php',
             data: 'pressure='+pressure,
             dataType: 'text',
             type: 'POST',
@@ -86,7 +86,7 @@
     function temperatureUpdate() {
         var temperature = document.getElementById('temperature').value;
         $.ajax({
-            url: 'http://local.pos.com:5000/temperature.php',
+            url: 'http://localhoast/NIO/1.0/Panel/temperature.php',
             data: 'temperature='+temperature,
             dataType: 'text',
             type: 'POST',
