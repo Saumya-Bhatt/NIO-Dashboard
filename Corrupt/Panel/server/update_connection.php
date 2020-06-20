@@ -2,7 +2,7 @@
 
     $data = $_REQUEST;
     $latest_status = $_REQUEST['connection_status'];
-    $con = mysqli_connect('localhost','root','','nio_dashboard');
+    $con = mysqli_connect('localhost','root','','dashboard');
 
     $get_last_request = "SELECT id FROM connection ORDER BY id DESC limit 1";
     $return_request = mysqli_query($con, $get_last_request);

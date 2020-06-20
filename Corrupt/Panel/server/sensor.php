@@ -1,8 +1,8 @@
 <?php
 
-$con = mysqli_connect('localhost','root','','nio_dashboard');
+$con = mysqli_connect('localhost','root','','dashboard');
 
-$get_last_query = 'SELECT msg FROM camera ORDER BY id DESC limit 1';
+$get_last_query = 'SELECT msg FROM sensor ORDER BY id DESC limit 1';
 $get_data = mysqli_query($con,$get_last_query);
 $row_count = mysqli_num_rows( $get_data );
 mysqli_close($con);
