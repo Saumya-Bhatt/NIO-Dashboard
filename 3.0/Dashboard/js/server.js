@@ -93,10 +93,11 @@ function cli_execute_mission() {
             var file3 = JSON.parse(file2[0]);
             var file = file3.file_dir;
             var test = file.split('/');
-            var div = document.getElementById('command_status').innerHTML = `<rt style='color: green'>Running : </rt>`+test[7];
+            document.getElementById('command_status').innerHTML = `<rt style='color: green'>Running : </rt>`+test[7];
         },
         error: function(http, status, error) {
             alert('ERROR: '+error);
+            document.getElementById('command_status').innerHTML = `<rt style='color: red'>Error : </rt>`+test[7];
         },
     })
 }
@@ -114,7 +115,7 @@ function abort_mission() {
             var file3 = JSON.parse(file2[0]);
             var file = file3.file_dir;
             var test = file.split('/');
-            var div = document.getElementById('command_status').innerHTML = `<rt style='color: red'>Aborted : </rt>`+test[7];
+            var div = document.getElementById('command_status').innerHTML = `<rt style='color: orange'>Aborted : </rt>`+test[7];
             $.ajax({
                 url: 'http://localhost/NIO/3.0/Dashboard/Server/abort_mission.php',
                 type: 'GET',

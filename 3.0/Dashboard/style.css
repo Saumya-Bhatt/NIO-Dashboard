@@ -138,9 +138,8 @@ button {
     display: flex;
     margin-bottom: 0px;
 }
-.coordinates input {
-    width: 45%;
-    margin: auto 10px;
+.coordinates p {
+    margin: auto 20px;
 }
 .gauges_row {
     display: flex;
@@ -172,8 +171,10 @@ button {
     font-size: 14px;
 }
 .map {
-    width: 60%;
-}
+    height: 300px;
+    width: 100%;
+  }
+
 
 
 
@@ -303,11 +304,11 @@ button {
 }
 .map_index li{
     font-size: 0.6em;
+    margin:  2px 10px;
 }
 .map_index {
-    background-color: rgba(#000, #000, #000, 0.3);
     border: none;
     border-radius: 10px;
-    float: right;
     margin-top: 0px;
+    display: flex;
 }

@@ -1,0 +1,116 @@
+[
+{"type":"header","version":"5.0.2","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"nio_dashboard"},
+{"type":"table","name":"camera","database":"nio_dashboard","data":
+[
+{"id":"1","msg":"Request to connect to camera"}
+]
+}
+,{"type":"table","name":"connection","database":"nio_dashboard","data":
+[
+{"id":"1","msg":"Request to connect","stat":"red"}
+]
+}
+,{"type":"table","name":"mission_file","database":"nio_dashboard","data":
+[
+{"id":"4","file_dir":"C:\/xampp\/htdocs\/NIO\/3.0\/Dashboard\/UPLOAD\/"}
+]
+}
+,{"type":"table","name":"run_mission","database":"nio_dashboard","data":
+[
+{"id":"1","file":"stringfrmt.py","output":"Chris bought 4 item(s) at a price of 3.24 each for a total of 12.96\n"},
+{"id":"2","file":"pandas.py","output":""},
+{"id":"3","file":"stringfrmt.py","output":"Chris bought 4 item(s) at a price of 3.24 each for a total of 12.96\n"},
+{"id":"4","file":"test.py","output":"Hello World!\n"},
+{"id":"5","file":"test.py","output":"Hello World!\n"},
+{"id":"6","file":"test.py","output":"Hello World!\n"},
+{"id":"7","file":"test.py","output":"Hello World!\n"},
+{"id":"8","file":"stringfrmt.py","output":"Chris bought 4 item(s) at a price of 3.24 each for a total of 12.96\n"}
+]
+}
+,{"type":"table","name":"send_battery","database":"nio_dashboard","data":
+[
+{"id":"1","percent":"4"},
+{"id":"2","percent":"42"},
+{"id":"3","percent":"42"},
+{"id":"4","percent":"42"},
+{"id":"5","percent":"42"}
+]
+}
+,{"type":"table","name":"send_depth","database":"nio_dashboard","data":
+[
+{"id":"1","val":"2"},
+{"id":"2","val":"287"},
+{"id":"3","val":"287"},
+{"id":"4","val":"287."},
+{"id":"5","val":"287.67"},
+{"id":"6","val":"287.672"},
+{"id":"7","val":"287.672"}
+]
+}
+,{"type":"table","name":"send_latitude","database":"nio_dashboard","data":
+[
+{"id":"1","val":"89"},
+{"id":"2","val":"89"},
+{"id":"3","val":"891"},
+{"id":"4","val":"891."},
+{"id":"5","val":"891.8"},
+{"id":"6","val":"891.80"}
+]
+}
+,{"type":"table","name":"send_longitude","database":"nio_dashboard","data":
+[
+{"id":"1","val":"1"},
+{"id":"2","val":"13"},
+{"id":"3","val":"13."},
+{"id":"4","val":"13.65"},
+{"id":"5","val":"13.65"},
+{"id":"6","val":""},
+{"id":"7","val":"6"},
+{"id":"8","val":"68"},
+{"id":"9","val":"6852"},
+{"id":"10","val":"6852"},
+{"id":"11","val":"6852."},
+{"id":"12","val":"6852.56"},
+{"id":"13","val":"6852.56"},
+{"id":"14","val":"6852.56"},
+{"id":"15","val":"6852.56"},
+{"id":"16","val":"682.56"},
+{"id":"17","val":"62.56"}
+]
+}
+,{"type":"table","name":"send_yaw","database":"nio_dashboard","data":
+[
+{"id":"1","val":"7"},
+{"id":"2","val":"72"}
+]
+}
+,{"type":"table","name":"sensor","database":"nio_dashboard","data":
+[
+{"id":"1","msg":"Request to connect to sensor","PAR":null},
+{"id":"2","msg":"","PAR":"67"},
+{"id":"3","msg":"","PAR":"67"},
+{"id":"4","msg":"","PAR":""},
+{"id":"5","msg":"","PAR":"6"},
+{"id":"6","msg":"","PAR":"623"},
+{"id":"7","msg":"","PAR":"623"},
+{"id":"8","msg":"","PAR":"6238"},
+{"id":"9","msg":"Request to connect to sensor","PAR":null},
+{"id":"10","msg":"","PAR":"623"},
+{"id":"11","msg":"","PAR":"62345"},
+{"id":"12","msg":"","PAR":"62345"}
+]
+}
+,{"type":"table","name":"sensor_ctd","database":"nio_dashboard","data":
+[
+{"id":"1","CTD":"3"},
+{"id":"2","CTD":"35"},
+{"id":"3","CTD":"35"},
+{"id":"4","CTD":"35 4"},
+{"id":"5","CTD":"35 47"},
+{"id":"6","CTD":"35 47"},
+{"id":"7","CTD":"35 47 2"},
+{"id":"8","CTD":"35 47 28"}
+]
+}
+]

@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Dashboard</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>-->
 
 </head>
 <body>
@@ -100,24 +104,29 @@
                         <div class="level_line"></div>               
                     </div>
                     <div class="level_coordi">
-                        <p>Pitch : <input type="text" id="pitch" readonly></p>
-                        <p>Roll: <input type="text" id="roll" readonly></p>
+                        <p>Pitch : </p>
+                        <p>Roll: </p>
                     </div>
                 </div>
             </div>
             <div class="coordinates">
-                <p id="depth" style="margin-right: 80px;"></p>
-                <p id="latitude"" style="margin-right: 80px;"></p>
+                <p id="depth"></p>
+                <p id="latitude"></p>
                 <p id="longitude"></p>
             </div>
             <div class="map_control">
-                <div class="map">MAP
+                <div id="map" class="map">
+
+                    <canvas id="myCanvas" width="450" height="300" style="border:1px solid #d3d3d3;">
+                        <img id="scream" width="600" height="300" style="max-width: 100%;" src="Images/raster_map.jpg" alt="The Scream">
+                    </canvas>
+
                     <ul class="map_index" style="list-style: none;">
                         <li><span class="red_dot">•</span>C-Bot Position</li>
                         <li><span class="blue_dot">•</span>Boat Position</li>
                         <li><span class="green_dot">•</span>Home Position</li>
                     </ul>
-                </div>            
+                </div>        
                 <div class="map_command">
                     <button onclick="user_position()" id="scan_map">User Position Scan GPS Port</button>
                     <div class="boat_coordinates">
@@ -133,6 +142,8 @@
 
     <script src="js/server.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/map.js"></script>
+
 
 </body>
 </html>

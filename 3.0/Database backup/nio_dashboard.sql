@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 20, 2020 at 02:53 PM
+-- Generation Time: Aug 09, 2020 at 09:26 AM
 -- Server version: 10.4.13-MariaDB
 -- PHP Version: 7.4.7
 
@@ -26,6 +26,8 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `camera`
 --
+-- Creation: Jun 20, 2020 at 06:39 AM
+--
 
 CREATE TABLE `camera` (
   `id` int(11) NOT NULL,
@@ -43,6 +45,8 @@ INSERT INTO `camera` (`id`, `msg`) VALUES
 
 --
 -- Table structure for table `connection`
+--
+-- Creation: Jun 20, 2020 at 06:31 AM
 --
 
 CREATE TABLE `connection` (
@@ -63,6 +67,8 @@ INSERT INTO `connection` (`id`, `msg`, `stat`) VALUES
 --
 -- Table structure for table `mission_file`
 --
+-- Creation: Jun 20, 2020 at 07:02 AM
+--
 
 CREATE TABLE `mission_file` (
   `id` int(11) NOT NULL,
@@ -81,6 +87,8 @@ INSERT INTO `mission_file` (`id`, `file_dir`) VALUES
 --
 -- Table structure for table `run_mission`
 --
+-- Creation: Jun 20, 2020 at 12:27 PM
+--
 
 CREATE TABLE `run_mission` (
   `id` int(11) NOT NULL,
@@ -96,12 +104,18 @@ INSERT INTO `run_mission` (`id`, `file`, `output`) VALUES
 (1, 'stringfrmt.py', 'Chris bought 4 item(s) at a price of 3.24 each for a total of 12.96\n'),
 (2, 'pandas.py', ''),
 (3, 'stringfrmt.py', 'Chris bought 4 item(s) at a price of 3.24 each for a total of 12.96\n'),
-(4, 'test.py', 'Hello World!\n');
+(4, 'test.py', 'Hello World!\n'),
+(5, 'test.py', 'Hello World!\n'),
+(6, 'test.py', 'Hello World!\n'),
+(7, 'test.py', 'Hello World!\n'),
+(8, 'stringfrmt.py', 'Chris bought 4 item(s) at a price of 3.24 each for a total of 12.96\n');
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `send_battery`
+--
+-- Creation: Jun 20, 2020 at 07:35 AM
 --
 
 CREATE TABLE `send_battery` (
@@ -124,6 +138,8 @@ INSERT INTO `send_battery` (`id`, `percent`) VALUES
 
 --
 -- Table structure for table `send_depth`
+--
+-- Creation: Jun 20, 2020 at 09:28 AM
 --
 
 CREATE TABLE `send_depth` (
@@ -149,6 +165,8 @@ INSERT INTO `send_depth` (`id`, `val`) VALUES
 --
 -- Table structure for table `send_latitude`
 --
+-- Creation: Jun 20, 2020 at 09:30 AM
+--
 
 CREATE TABLE `send_latitude` (
   `id` int(11) NOT NULL,
@@ -171,6 +189,8 @@ INSERT INTO `send_latitude` (`id`, `val`) VALUES
 
 --
 -- Table structure for table `send_longitude`
+--
+-- Creation: Jun 20, 2020 at 09:32 AM
 --
 
 CREATE TABLE `send_longitude` (
@@ -206,6 +226,8 @@ INSERT INTO `send_longitude` (`id`, `val`) VALUES
 --
 -- Table structure for table `send_yaw`
 --
+-- Creation: Jun 20, 2020 at 07:37 AM
+--
 
 CREATE TABLE `send_yaw` (
   `id` int(11) NOT NULL,
@@ -224,6 +246,8 @@ INSERT INTO `send_yaw` (`id`, `val`) VALUES
 
 --
 -- Table structure for table `sensor`
+--
+-- Creation: Jun 20, 2020 at 10:00 AM
 --
 
 CREATE TABLE `sensor` (
@@ -254,6 +278,8 @@ INSERT INTO `sensor` (`id`, `msg`, `PAR`) VALUES
 
 --
 -- Table structure for table `sensor_ctd`
+--
+-- Creation: Jun 20, 2020 at 10:03 AM
 --
 
 CREATE TABLE `sensor_ctd` (
@@ -365,13 +391,13 @@ ALTER TABLE `connection`
 -- AUTO_INCREMENT for table `mission_file`
 --
 ALTER TABLE `mission_file`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `run_mission`
 --
 ALTER TABLE `run_mission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `send_battery`
