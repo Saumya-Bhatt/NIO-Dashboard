@@ -9,6 +9,7 @@ import json
 import mysql.connector
 import time
 import sys
+import os
 
 
 
@@ -17,7 +18,7 @@ import sys
 #================================================================
 
 def newline(n):
-    for i in range(3):
+    for i in range(n):
         st.markdown('\n')
 
 
@@ -299,10 +300,9 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
     st.markdown('Send request to C-Bot to access its live stream and get current location')
 
     if st.button('Send Request'):
-        try:
-            st.markdown('Current Location:')
-            st.dataframe(c_bot)
-            st.video(video_bytes)
-            cmd_status.success('Request successful')
-        except:
-            cmd_status.error('Error accessing video stream right now')
+        st.markdown("The video stream should be visible in another window. Press 'q' to exit.")
+        st.markdown('Current Location:')
+        st.dataframe(c_bot)
+        #st.video(video_bytes)
+        #cmd_status.success('Request successful')
+        os.system('python cam.py')
