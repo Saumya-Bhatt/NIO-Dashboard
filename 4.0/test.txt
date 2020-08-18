@@ -1,5 +1,0 @@
-Laser cutter, as the name suggests, is a device that uses a thin and focused laser beam to cut intricate and accurate designs in materials. Powerful laser beam cuts, melts and vaporizes materials.
-
-It is a difficult process to manufacture small-sized and thin parts of materials with high accuracy. And that’s when laser cutters come to the rescue of product designers. Apart from reducing manufacturing costs and high duarability, it also provides higher accuracy while consuming less energy (unlike plasma cutters).
-
-At SANDBOX, we have the Laser Engraving - Cutting machine, that uses the CO2 laser for engraving and cutting materials. Using this, students can easily cut materials and customize parts for their projects with multiple and complex designs. It has a power range of 40 - 60 W. It has an engraving speed of 0 - 64000 mm/min and a cutting speed of 0 - 30000 mm/min.
