@@ -1,195 +1,32 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pydeck as pdk
 import matplotlib.pyplot as plt
 
-import datetime
-import json
-import mysql.connector
-import time
+import matplotlib
 import sys
 import os
 import cv2
 import utm
-import csv
 
-from image_cv import image_browser
 from PIL import Image
+from imageMap import image_browser
+from cam import streamVideo
+from fileSQL import *
+from onlineMap import *
+from frame import *
 
 
-#================================================================
-#===================== COMPUTATION ==============================
-#================================================================
+font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 22}
 
-def newline(n):
-    for i in range(n):
-        st.markdown('\n')
-
-def cleanFile(file):
-    data = file.readlines()
-    reader = csv.reader(data)
-    temp = []
-    for row in reader:
-        temp.append(row)
-    return temp
-
-
-
-#--------------------------MAPPING--------------------------------------------
-location_file = json.loads(open('location.json').read())
-
-home = pd.DataFrame.from_dict(location_file['home'])
-boat = pd.DataFrame.from_dict(location_file['boat'])
-c_bot = pd.DataFrame.from_dict(location_file['c-bot'])
-
-lat_sum = 0
-for i in ['home','boat','c-bot']:
-    lat_sum += location_file[i]['latitude'][0]
-midlat = float(lat_sum/3)
-long_sum = 0
-for i in ['home','boat','c-bot']:
-    long_sum += location_file[i]['longitude'][0]
-midlong = float(long_sum/3)
-
-
-
-
-#   map_plot = plt.imread('raster_map.png')
-#   bounding_box = (73.79,73.81,15.45,15.46)
-
-#   latitude = [location_file[i]['latitude'][0]-0.00125 for i in location_file]
-#   longitude = [location_file[i]['longitude'][0]+0.00125 for i in location_file]
-
-#   fig, ax = plt.subplots(figsize=(17,17))
-#   ax.scatter(longitude[0],latitude[0],color='green',s=200)
-#   ax.scatter(longitude[1],latitude[1],color='blue',s=200)
-#   ax.scatter(longitude[2],latitude[2],color='red',s=200)
-#   geo_map = ax.imshow(map_plot,extent=bounding_box)
-
-
-online_map = pdk.Deck(
-            map_style='mapbox://styles/mapbox/light-v9',
-            initial_view_state=pdk.ViewState(
-                latitude=midlat,
-                longitude=midlong,
-                zoom=16,
-                pitch=50,
-            ),
-            layers=[
-                pdk.Layer(
-                    'HexagonLayer',
-                    data=home,
-                    get_position='[longitude, latitude]',
-                    radius=20,
-                    elevation_scale=4,
-                    elevation_range=[0, 1000],
-                    get_color='[0, 255, 0, 160]',
-                    pickable=True,
-                    extruded=True,
-                ),
-                pdk.Layer(
-                    'ScatterplotLayer',
-                    data=boat,
-                    get_position='[longitude, latitude]',
-                    get_color='[0, 0, 255, 160]',
-                    get_radius=20,
-                ),
-                pdk.Layer(
-                    'ScatterplotLayer',
-                    data=c_bot,
-                    get_position='[longitude, latitude]',
-                    get_color='[200, 0, 0, 160]',
-                    get_radius=20,
-                ),
-            ],
-        )
-
-
-
-#--------------------------SIDEBAR--------------------------------------------
-battery = 78
-dt = datetime.datetime.now()
-
-
-
-#--------------------------FILE CONTROL--------------------------------------------
-def sql_queries_static(query,param1=None,param2=None):
-    mydb = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='nio_python'
-    )
-    mycursor = mydb.cursor()
-    if param1==None and param2==None:
-        mycursor.execute(query)
-    else:
-        mycursor.execute(query%(param1,param2))
-    mydb.commit()
-    mydb.close()
-    mycursor.close()
-
-def sql_queries_dynamic(query,param1=None,param2=None):
-    mydb = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='nio_python'
-    )
-    mycursor = mydb.cursor()
-    if param1==None and param2==None:
-        mycursor.execute(query)
-    else:
-        mycursor.execute(query%(param1,param2))
-    req_data = mycursor.fetchall()
-    mydb.close()
-    mycursor.close()
-    return req_data
-
-def upload_mission(file):
-    val=file.getvalue()
-    upl_time=datetime.datetime.now()
-    query="INSERT INTO mission_upload(input,time_stamp,status) VALUES ('%s','%s','UPLOADED')"
-    sql_queries_static(query,val,upl_time)
-
-
-def abort_mission():
-    query="DELETE FROM mission_upload ORDER BY id DESC LIMIT 1"
-    sql_queries_static(query)
-
-
-def run_mission():
-    query="UPDATE nio_python.mission_upload SET status='RUNNING' WHERE id=( SELECT id FROM mission_upload ORDER BY id DESC LIMIT 1 )"
-    sql_queries_static(query)
-
-def table_empty():
-    query="SELECT * FROM mission_upload"
-    data = sql_queries_dynamic(query)
-    if len(data)==0:
-        return True
-    else:
-        return False
-
-def current_uploads():
-    query="SELECT * FROM mission_upload"
-    return sql_queries_dynamic(query)
-
-
-
+matplotlib.rc('font', **font)
 
 
 #--------------------------VIDEO--------------------------------------------
-video_file = open('video.mp4','rb')
-video_bytes = video_file.read()
-
-
-
-
-#============================================================================
-#========================= FRAMEWORK ========================================
-#============================================================================
-
+#video_file = open('video.mp4','rb')
+#video_bytes = video_file.read()
 
 
 
@@ -199,10 +36,6 @@ st.subheader('Marine robot dashboard')
 
 newline(2)
 
-
-
-
-#--------------------------INITIALIZING SIDEBAR--------------------------------
 st.sidebar.markdown('__Battery Status__ : %d %%'%battery)
 battery = st.sidebar.progress(battery)
 
@@ -262,8 +95,6 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
 
     if UPLOADED_FILE is not None:
-        #os.system('cmd /c "python image_cv.py"')
-
 
         BASEWIDTH = 1500
         IMG_BUFFER = Image.open(UPLOADED_FILE)
@@ -294,18 +125,16 @@ if st.sidebar.checkbox('Open Console',False,key=1):
         #loc3 = utm.from_latlon(15.456319, 73.801897)
 
         latitude = [home[0]%10000,boat[0]%10000,cbot[0]%10000]
-        longitude = [(loc2[1]-home[1])%10000,(loc2[1]-boat[1])%10000,(loc2[1]-cbot[1])%10000]
+        longitude = [(loc2[1]-home[1])%10000-90,(loc2[1]-boat[1])%10000-90,(loc2[1]-cbot[1])%10000-90]
 
         fig, ax = plt.subplots(figsize=(20,15))
         ax.scatter(latitude[0],longitude[0],color='green',s=400)
         ax.scatter(latitude[1],longitude[1],color='blue',s=400)
         ax.scatter(latitude[2],longitude[2],color='red',s=400)
-        ax.set_xlable('Latitude in UTM')
-        ax.set_ylable('Longitude in UTM')
 
         ax.imshow(map_plot,extent=bounding_box)
-
         st.pyplot()
+        st.markdown('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _x-axis : Latitude in UTM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y-axis : Longitude in UTM_')
 
         data_frame = {
             'HOME' : [float(loc_data[0][0]),float(loc_data[0][1]),'🟢'],
@@ -398,12 +227,16 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
     st.subheader('Live Camera Feed')
     st.markdown('Send request to C-Bot to access its live stream and get current location')
 
+    if st.checkbox('Read Instructions',False,key='cam_inst'):
+        st.markdown('__1__. Make sure that the browser and the bot are over the same network.')
+        st.markdown('__2__. In a new tab enter the network URL (eg, 192.168.43.163:8080) and in the window select `Video Render` option as `Javascript`')
+        st.markdown('__3__.Enter the same network url (without http://) in the box below and press enter.')
+        st.markdown("__4__.A stream window will start in a new window. Press 'q' to exit")
+        newline(1)
 
-
-    if st.button('Send Request'):
-        st.markdown("The video stream should be visible in another window. Press 'q' to exit.")
-        st.markdown('Current Location:')
-        st.dataframe(c_bot)
-        #st.video(video_bytes)
-        #cmd_status.success('Request successful')
-        os.system('python cam.py')
+    URL = st.text_input('Enter the url of the network stream : ')
+    try:
+        if URL != '':
+            streamVideo(URL)
+    except:
+        cmd_status.warning('Unable to reach the streaming network')
