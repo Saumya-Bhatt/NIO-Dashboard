@@ -31,6 +31,9 @@ def image_browser(imported_image):
 
     #Here, you need to change the image name and it's path according to your directory
     img = cv2.imread(imported_image)
+    cv2.namedWindow('Select TOP-LEFT and BOTTOM-RIGHT points',cv2.WINDOW_NORMAL)
+    height,width = img.shape[:2]
+    cv2.resizeWindow('Select TOP-LEFT and BOTTOM-RIGHT points',width//2,height//2)
     cv2.imshow("Select TOP-LEFT and BOTTOM-RIGHT points", img)
 
     #calling the mouse click event
@@ -45,4 +48,4 @@ def image_browser(imported_image):
     #imgp_crop = imgp_crop.convert('L')
     imgp_crop.save('crop.png',type='PNG')
 
-    return refPt
+    return None

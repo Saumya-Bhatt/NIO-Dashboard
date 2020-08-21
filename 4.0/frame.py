@@ -14,5 +14,13 @@ def cleanFile(file):
         temp.append(row)
     return temp
 
+def data_frame(data):
+    frame = {
+    'HOME' : [float(data[0][0]),float(data[0][1]),'🟢'],
+    'BOAT' : [float(data[1][0]),float(data[1][1]),'🔵'],
+    'C-BOT' : [float(data[2][0]),float(data[2][1]),'🔴']
+    }
+    return frame
+
 battery = 78
 dt = datetime.datetime.now()

@@ -1,84 +1,33 @@
-import streamlit as st
-import os
-import utm
-import csv
-
 import matplotlib.pyplot as plt
-from image_cv import image_browser
-
-def cleanFile(file):
-    data = file.readlines()
-    reader = csv.reader(data)
-    temp = []
-    for row in reader:
-        temp.append(row)
-    return temp
-
-a = st.text_input('Enter input:')
-u = 'https://'+a
-st.text(u)
+import utm
 
 
-st.markdown('__1__. Choose an image file from below')
-st.markdown('__2__. Select two points from the image, one should be the top left corner and another the bottom right corner of the map that you want.')
-st.markdown('__3__. Enter the coordinates of those two points')
-st.markdown('__4__. The map is now initialized.')
-st.markdown('__5__. Delete the image after use.')
+loc1 = utm.from_latlon(22.548133, 72.850833)
+loc2 = utm.from_latlon(22.433067, 72.991698)
 
-REFLOC = st.file_uploader('Enter a reference location file',type='txt',key='456')
-if REFLOC is not None:
-    data = cleanFile(REFLOC)
+home = utm.from_latlon(22.507484, 72.950398)
+boat = utm.from_latlon(22.486708, 72.929456)
+cbot = utm.from_latlon(22.476398, 72.910745)
 
-UPLOADED_FILE = st.file_uploader("Choose an image file", type="png", key='123')
-image_holder = st.empty()
-pixel_holder1 = st.empty()
-pixel_holder2 = st.empty()
+from PIL import Image
 
+image = Image.open('crop.png')
+width,height = image.size
+print(width,height)
 
-if UPLOADED_FILE is not None:
-    #os.system('cmd /c "python image_cv.py"')
+scale_x = width/abs(loc1[0]-loc2[0])
+scale_y = height/abs(loc1[1]-loc2[1])
+print(scale_x,scale_y)
 
+map_plot = plt.imread('crop.png')
+bounding_box = (0,width,0,height)
 
-    BASEWIDTH = 1500
-    IMG_BUFFER = Image.open(UPLOADED_FILE)
-    WPERCENT = (BASEWIDTH/float(IMG_BUFFER.size[0]))
-    H_SIZE = int((float(IMG_BUFFER.size[1])*float(WPERCENT)))
-    IMG_BUFFER = IMG_BUFFER.resize((BASEWIDTH,H_SIZE), Image.ANTIALIAS)
-    IMG_BUFFER = IMG_BUFFER.convert('L')
-    
-    IMG_BUFFER.save('buffer.png')
-    FILE_PATH = 'buffer.png'
+latitude = [(loc1[0]-home[0])*scale_x+width,(loc1[0]-boat[0])*scale_x+width,(loc1[0]-cbot[0])*scale_x+width]
+longitude = [(loc2[1]-home[1])*scale_y+height,(loc2[1]-boat[1])*scale_y+height,(loc2[1]-cbot[1])*scale_y+height]
 
-    GRID_MAP = image_browser(FILE_PATH)
-    image = Image.open('crop.png')
-    image_holder.image(image)
-
-    pixel_holder1.markdown('The image size is %d x %d'%(GRID_MAP[1][0]-GRID_MAP[0][0], GRID_MAP[1][1]-GRID_MAP[0][1]))
-
-    loc1 = utm.from_latlon(float(data[0][0]),float(data[0][1]))
-    loc2 = utm.from_latlon(float(data[1][0]),float(data[1][1]))
-
-    map_plot = plt.imread('crop.png')
-    bounding_box = (loc1[0]%10000,loc2[0]%10000,loc1[1]%10000,loc2[1]%10000)
-
-    loc3 = utm.from_latlon(15.456319, 73.801897)
-
-    latitude = [loc3[0]%10000]
-    longitude = [(loc2[1]-loc3[1])%10000-40]
-
-    fig, ax = plt.subplots(figsize=(20,20))
-    ax.scatter(latitude,longitude,color='red',s=200)
-
-    ax.imshow(map_plot,extent=bounding_box)
-
-    st.pyplot()
-
-
-if st.button('Delete recent image'):
-
-    os.system('del crop.png')
-    os.system('del buffer.png')
-    uploaded_file = None
-
-    image_holder.markdown('No image selected')
-    pixel_holder1.markdown("[-,-]")
+fig, ax = plt.subplots(figsize=(15,10))
+ax.scatter(latitude[0],longitude[0],color='green',s=200)
+ax.scatter(latitude[1],longitude[1],color='blue',s=200)
+ax.scatter(latitude[2],longitude[2],color='red',s=200)
+ax.imshow(map_plot,extent=bounding_box)
+plt.show()
