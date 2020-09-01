@@ -4,14 +4,14 @@
 2. After downloading XAMPP, open the application. It should be in C:/xampp/xampp-control.exe
 3. In the control pannel that opens up, click on the Apache and MySQL start button. It will start running once the text on the dashboard turns to green.
 
-![This is how the XAMPP panel looks after clicking on the start button for Apache and MySQL](SETUP\Extra\Images\xampp.png)
+![This is how the XAMPP panel looks after clicking on the start button for Apache and MySQL](SETUP\Extra\Images\xampp.png?raw=true)
 
 4. In your browser, open [localhost/phpmyadmin/](http://localhost/phpmyadmin/). It will open up a MySQL dashboard.
 5. On the left-hand side, there would be a button called new. Click on it. It will open up a window saying 'Create Database'.
 6. Just give the Database name as - `nio_python`. Click on 'Create' to continue.
 <br></br>
 
-![The Create Table window](SETUP\Extra\Images\create_db.png)
+![The Create Table window](SETUP\Extra\Images\create_db.png?raw=true)
 <br></br>
 
 7. You will automatically taken to the 'trial Database'. On the topbar, there would be an option of 'Import'. Click on it.
@@ -33,7 +33,7 @@
 
 In the __APP folder__, open the command shell and type `python run.py`. It should automatically show open the browser and display the dashboard and also display the network URL and the local URL.
 
-![Running the application](SETUP\Extra\Images\running_app.png)
+![Running the application](SETUP\Extra\Images\running_app.png?raw=true)
 
 If the above mentioned step does not run, in the same root folder, open the command shell and type `streamlit run app.py`. Alawys keep the command shell on which the above file is running open. DO NOT CLOSE IT, as that would shut down the application.
 
@@ -48,7 +48,7 @@ For offline maps, there's already trial files ready for use (The locations are t
 1. Firstly create a file - 'locations.txt'. It should have the coordinates of the places (currently accepts only 3 places) that you want to have it mapped in the lat-long format seperated by ','. New coordinate should start on a newline.
 <br></br>
 
-![Format of writing in the locations.txt and refloc.txt file](SETUP\Extra\Images\locations.png)
+![Format of writing in the locations.txt and refloc.txt file](SETUP\Extra\Images\locations.png?raw=true)
 
 2. __For using the Offline map:__ 
     
@@ -80,15 +80,15 @@ The dashboard uses a third-party IP camera to get the camera feed. This could be
 2. Open the application and scroll to the bottom and click on the 'Start Server'
 <br></br>
 
-![Scroll to the bottom and click on Start Server](SETUP\Extra\Images\ip_camera.jpg)
+![Scroll to the bottom and click on Start Server](SETUP\Extra\Images\ip_camera.jpg?raw=true)
 
 3. Click copy the url given. It should be of the format: http:\\192.168.43.129:8080
 
-![Click copy the url given. Eg http:\\192.168.43.129:8080](SETUP\Extra\Images\ip_address.png)
+![Click copy the url given. Eg http:\\192.168.43.129:8080](SETUP\Extra\Images\ip_address.png?raw=true)
 
 4. Open that URL into a browser. It should open up a new dashboard. In the video render option, select 'Javascript'.
 
-![Open the copied link into the browser. It should display this window](SETUP\Extra\Images\ip_browser.png)
+![Open the copied link into the browser. It should display this window](SETUP\Extra\Images\ip_browser.png?raw=true)
 
 5. Now the URL that you copied, just enter the 192.168.43.129:8080 part into the camera-feed console. It will open up a new window externally and start streaming video from the device on which IP camera application has been installed.
 
