@@ -125,7 +125,7 @@ if st.sidebar.checkbox('Open Console',False,key=1):
             ax.scatter(latitude[1],longitude[1],color='blue',s=20)
             ax.scatter(latitude[2],longitude[2],color='red',s=20)
             ax.imshow(arr,extent=bounding_box,cmap='gray')
-            st.pyplot()
+            st.pyplot(fig)
 
             st.markdown('__X-Axis__ : _1 unit = %f m_ &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp&nbsp __Y-Axis__ : _1 unit = %f m_'%((1/scale_x),(1/scale_y)))
             newline(1)
