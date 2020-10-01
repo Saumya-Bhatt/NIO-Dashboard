@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Side</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+</head>
+<body>
+
+    <h1>Server Side Panel</h1>
+    <br>
+
+    <h3>Home Position</h3>
+    <div class="parentdiv">
+        <div class="mydiv">
+            <p>Longitude : </p>
+            <input id="home_longitude" type="text">
+        </div>
+        <div class="mydiv">
+            <p>Latitude : </p>
+            <input id="home_latitude" type="text">
+        </div>
+        <button type="submit" onclick="home_position()">Submit value</button>
+    </div>
+    <br>
+
+    <h3>Boat Position</h3>
+    <div class="parentdiv">
+        <div class="mydiv">
+            <p>Longitude : </p>
+            <input id="boat_longitude" type="text">
+        </div>
+        <div class="mydiv">
+            <p>Latitude : </p>
+            <input id="boat_latitude" type="text">
+        </div>
+        <button type="submit" onclick="boat_position()">Submit value</button>
+    </div>
+    <br>
+
+    <h3>C-Bot Position</h3>
+    <div class="parentdiv">
+        <div class="mydiv">
+            <p>Longitude : </p>
+            <input id="cbot_longitude" type="text">
+        </div>
+        <div class="mydiv">
+            <p>Latitude : </p>
+            <input id="cbot_latitude" type="text">
+        </div>
+        <button type="submit" onclick="cbot_position()">Submit value</button>
+    </div>
+    <br>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

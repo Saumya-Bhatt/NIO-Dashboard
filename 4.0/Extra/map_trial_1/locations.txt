@@ -1,0 +1,12 @@
+Home {
+    longitude: 15.456380, 
+    latitude: 73.801925
+}
+Boat {
+    longitude: 15.456070,
+    latitude: 73.797515
+}
+C-Bot {
+    longitude: 15.457993,
+    latitude: 73.799479
+}

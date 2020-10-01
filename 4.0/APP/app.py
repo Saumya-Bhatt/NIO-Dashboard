@@ -13,8 +13,10 @@ import json
 from PIL import Image
 from cam import streamVideo
 from onlineMap import getOnlineMap
-from fileSQL import *
-from frame import *
+from offlineMap import getOfflineMap
+from frame import newline, battery, dt, data_frame, cleanFile
+from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty
+from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
 
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
@@ -48,6 +50,7 @@ st.markdown('__Time__   :   %s:%s:%s'%(dt.hour,dt.minute,dt.second))
 
 
 
+
 #--------------------------POSITION--------------------------------------------
 st.sidebar.markdown('### Position')
 st.sidebar.markdown('Represents the current location of the C-Bot, home and the boat')
@@ -58,11 +61,17 @@ if st.sidebar.checkbox('Open Console',False,key=1):
     st.markdown('Represents the current location of the C-Bot, home and the boat. Upload the text file containing locations of the places to be represented. The locations should be in LatLong.')
     newline(1)
 
-    LOC_FILE = st.file_uploader('Enter locations file here [.TXT]',type='txt',key='location')
-    if LOC_FILE is not None:
-        loc_data = cleanFile(LOC_FILE)
-        DATA_INDEX = pd.DataFrame(data_frame(loc_data),index=['Longitude','Latitude','Marker'])
-    newline(1)
+    get_home = get_home_pos()
+    get_boat = get_boat_pos()
+    get_cbot = get_cbot_pos()
+
+    #latitude, longitude
+    HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
+    BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
+    CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+
+    DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+
 
     if st.checkbox('Open Offline Map',key='offline_map'):
 
@@ -76,55 +85,24 @@ if st.sidebar.checkbox('Open Console',False,key=1):
         if REFLOC is not None:
             data = cleanFile(REFLOC)
 
+        newline(1)
 
         if st.button('Clear Buffer image'):
             try:
                 os.system('del UPLOAD/buffer.png')
                 uploaded_file = None
-                st.markdown('You are good to go')
+                st.success('You are good to go')
             except:
-                st.markdown('No image currently in use')
+                st.warning('No image currently in use')
+        st.markdown('Not clearing buffer image before proceeding will show the previously used image')
+
+        newline(1)
 
 
         UPLOADED_FILE = st.file_uploader("Choose an image file [.PNG]", type="png", key='map')
         if UPLOADED_FILE is not None:
 
-            BASEWIDTH = 1500
-            IMG_BUFFER = Image.open(UPLOADED_FILE)
-            WPERCENT = (BASEWIDTH/float(IMG_BUFFER.size[0]))
-            H_SIZE = int((float(IMG_BUFFER.size[1])*float(WPERCENT)))
-            IMG_BUFFER = IMG_BUFFER.resize((BASEWIDTH,H_SIZE), Image.ANTIALIAS)
-            
-            IMG_BUFFER.save('UPLOAD/buffer.png')
-            FILE_PATH = 'UPLOAD/buffer.png'
-
-            image = Image.open(FILE_PATH)
-            width,height = image.size
-            st.markdown('The selected image size is %dp x %dp'%(width,height))
-
-            loc1 = utm.from_latlon(float(data[0][0]),float(data[0][1]))
-            loc2 = utm.from_latlon(float(data[1][0]),float(data[1][1]))
-
-            home = utm.from_latlon(float(loc_data[0][0]),float(loc_data[0][1]))
-            boat = utm.from_latlon(float(loc_data[1][0]),float(loc_data[1][1]))
-            cbot = utm.from_latlon(float(loc_data[2][0]),float(loc_data[2][1]))
-
-            width,height = image.size
-            scale_x = width/abs(loc1[0]-loc2[0])
-            scale_y = height/abs(loc1[1]-loc2[1])
-
-            map_plot = Image.open(FILE_PATH).convert("L")
-            arr = np.asarray(map_plot)
-            bounding_box = (width,0,height,0)
-
-            latitude = [(loc1[0]-home[0])*scale_x+width,(loc1[0]-boat[0])*scale_x+width,(loc1[0]-cbot[0])*scale_x+width]
-            longitude = [(loc2[1]-home[1])*scale_y+height,(loc2[1]-boat[1])*scale_y+height,(loc2[1]-cbot[1])*scale_y+height]
-
-            fig, ax = plt.subplots()
-            ax.scatter(latitude[0],longitude[0],color='green',s=20)
-            ax.scatter(latitude[1],longitude[1],color='blue',s=20)
-            ax.scatter(latitude[2],longitude[2],color='red',s=20)
-            ax.imshow(arr,extent=bounding_box,cmap='gray')
+            fig, scale_x, scale_y = getOfflineMap(UPLOADED_FILE, data, HOME_POSITION, BOAT_POSITION, CBOT_POSITION)
             st.pyplot(fig)
 
             st.markdown('__X-Axis__ : _1 unit = %f m_ &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp&nbsp __Y-Axis__ : _1 unit = %f m_'%((1/scale_x),(1/scale_y)))
@@ -139,21 +117,8 @@ if st.sidebar.checkbox('Open Console',False,key=1):
     if st.checkbox('Open online Map',key='online_map'):
         st.markdown('The dashboard will display the map of the last location file entered unless a new one is uploaded.')
             
-        with open('location.json','r') as jsonFile:
-            dump = json.load(jsonFile)
 
-        dump['home']['latitude'] = [float(loc_data[0][0])]
-        dump['home']['longitude'] = [float(loc_data[0][1])]
-        dump['boat']['latitude'] = [float(loc_data[1][0])]
-        dump['boat']['longitude'] = [float(loc_data[1][1])]
-        dump['c-bot']['latitude'] = [float(loc_data[2][0])]
-        dump['c-bot']['longitude'] = [float(loc_data[2][1])]
-
-        with open("location.json", "w") as jsonFile:
-            json.dump(dump, jsonFile)
-
-
-        my_map = getOnlineMap()
+        my_map = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
         st.pydeck_chart(my_map)
         st.subheader('Coordinates and markers')
         st.markdown('The coordinates are given below are in LatLong.')

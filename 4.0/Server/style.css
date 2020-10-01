@@ -1,0 +1,12 @@
+body {
+    margin: 100px 150px;
+}
+input {
+    margin:  auto 30px;
+}
+.mydiv {
+    display: flex;
+}
+.parentdiv {
+    display: flex;
+}

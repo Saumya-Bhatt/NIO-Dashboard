@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+matplotlib = "==3.3.2"
+numpy = "==1.19.2"
+pandas = "==1.1.2"
+pydeck = "==0.4.1"
+streamlit = "==0.67.0"
+utm = "==0.6.0"
+opencv-python = "==4.3.0.36"
+Pillow = "==7.2.0"
+mysql-connector-python = "==8.0.17"
+
+[requires]
+python_version = "3.8"

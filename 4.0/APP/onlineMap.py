@@ -2,21 +2,27 @@ import json
 import pandas as pd
 import pydeck as pdk
 
-def getOnlineMap():
+def getOnlineMap(hpos,bpos,cpos):
 
-    location_file = json.loads(open('location.json').read())
+    #location_file = json.loads(open('location.json').read())
+    h_data = {'latitude':[hpos[0]], 'longitude':[hpos[1]]}
+    b_data = {'latitude':[bpos[0]], 'longitude':[bpos[1]]}
+    c_data = {'latitude':[cpos[0]], 'longitude':[cpos[1]]}
 
-    home = pd.DataFrame.from_dict(location_file['home'])
-    boat = pd.DataFrame.from_dict(location_file['boat'])
-    c_bot = pd.DataFrame.from_dict(location_file['c-bot'])
+    location_file = {'home':hpos, 'boat':bpos, 'c-bot':cpos}
+
+
+    home = pd.DataFrame.from_dict(h_data)
+    boat = pd.DataFrame.from_dict(b_data)
+    c_bot = pd.DataFrame.from_dict(c_data)
 
     lat_sum = 0
     for i in ['home','boat','c-bot']:
-        lat_sum += location_file[i]['latitude'][0]
+        lat_sum += location_file[i][0]
     midlat = float(lat_sum/3)
     long_sum = 0
     for i in ['home','boat','c-bot']:
-        long_sum += location_file[i]['longitude'][0]
+        long_sum += location_file[i][1]
     midlong = float(long_sum/3)
 
 
