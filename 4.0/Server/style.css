@@ -10,3 +10,9 @@ input {
 .parentdiv {
     display: flex;
 }
+.container {
+    display: flex;
+}
+.files {
+    margin: 0px 50px;
+}
