@@ -231,6 +231,12 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
 st.sidebar.markdown('### Stop Functions')
 st.sidebar.markdown('Do this if dashboard hangs')
 if st.sidebar.checkbox('Kill all processes'):
+    st.markdown('All functions connecting to the server side has been paused.')
+    st.markdown('1. Functionalities which involve connecting to the server side has been paused.')
+    st.markdown('2. You can open the consoles but the data displaying there will not be dynamically updated and sent to the server.')
+    st.markdown('3. Communication from the dashboard to the server is allowed but reverse is not true here.')
+    newline(1)
+    st.markdown('To restart the processes, toggle the `kill all processes` checkbox in the sidebar')
     st.stop()
 
 schedule.every(1).seconds.do(get_time)
