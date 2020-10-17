@@ -149,13 +149,28 @@ if st.sidebar.checkbox('Open Console',False,key=1):
     
     if st.checkbox('Open online Map',key='online_map'):
         st.markdown('The dashboard will display the map of the last location file entered unless a new one is uploaded.')
-            
 
-        my_map = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
-        st.pydeck_chart(my_map)
+        online_map = st.empty()
         st.subheader('Coordinates and markers')
         st.markdown('The coordinates are given below are in LatLong.')
-        st.dataframe(DATA_INDEX)
+        online_locations = st.empty()
+
+        def get_online_map():
+            get_home = get_home_pos()
+            get_boat = get_boat_pos()
+            get_cbot = get_cbot_pos()
+
+            HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
+            BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
+            CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+
+            DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+            my_map = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
+            online_locations.dataframe(DATA_INDEX)
+            return online_map.pydeck_chart(my_map)
+
+        #st.pydeck_chart(my_map)
+
             
 
 
@@ -283,6 +298,7 @@ if st.sidebar.checkbox('Kill all processes'):
 schedule.every(1).seconds.do(get_time)
 schedule.every(1).seconds.do(get_date)
 schedule.every(5).seconds.do(get_battery_value)
+schedule.every(5).seconds.do(get_online_map)
 
 while True: 
     schedule.run_pending() 
