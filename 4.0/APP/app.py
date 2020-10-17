@@ -4,6 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import matplotlib
+import schedule
+import datetime
+import time
 import sys
 import os
 import cv2
@@ -14,7 +17,7 @@ from PIL import Image
 from cam import streamVideo
 from onlineMap import getOnlineMap
 from offlineMap import getOfflineMap
-from frame import newline, battery, dt, data_frame, cleanFile
+from frame import newline, battery, data_frame, cleanFile
 from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty
 from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
 
@@ -38,13 +41,23 @@ st.subheader('Marine robot dashboard')
 
 newline(2)
 
+dt_time = st.empty()
+dt_date = st.empty()
+
+def get_time():
+    get_current = datetime.datetime.now()
+    current = get_current.strftime("%H:%M:%S")
+    return dt_time.markdown('__Time__ : %s'%current)
+
+def get_date():
+    today = datetime.date.today()
+    return dt_date.markdown('__Date__ : %s'%today)
+
 st.sidebar.markdown('__Battery Status__ : %d %%'%battery)
 battery = st.sidebar.progress(battery)
 
 cmd_status = st.sidebar.empty()
 
-st.markdown('__Date__  :   %s/%s/%s'%(dt.day,dt.month,dt.year))
-st.markdown('__Time__   :   %s:%s:%s'%(dt.hour,dt.minute,dt.second))
 
 
 
@@ -212,3 +225,21 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
             streamVideo(URL)
     except:
         cmd_status.warning('Unable to reach the streaming network')
+
+
+
+st.sidebar.markdown('### Stop Functions')
+st.sidebar.markdown('Do this if dashboard hangs')
+if st.sidebar.checkbox('Kill all processes'):
+    st.stop()
+
+schedule.every(1).seconds.do(get_time)
+schedule.every(1).seconds.do(get_date)
+
+
+while True: 
+  
+    # Checks whether a scheduled task  
+    # is pending to run or not 
+    schedule.run_pending() 
+    time.sleep(1)

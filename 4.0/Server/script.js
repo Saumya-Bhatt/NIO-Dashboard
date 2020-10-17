@@ -99,3 +99,25 @@ function get_mission_file() {
 }
 get_mission_file()
 setInterval(get_mission_file,1000)
+
+//=================================================
+//=============== BATTERY STATUS ====================
+//=================================================
+
+function battery_status() {
+    var bat_value = $("#battery_status").val();
+    console.log(bat_value)
+    $.ajax({
+        url: "http://localhost/NIO/4.0/scripts/integer_values/battery_status.php",
+        data: {battery_status: bat_value},
+        type: 'GET',
+        dataType: 'text',
+        success: function(response, status, http) {
+            console.log('Updated battery value sent to battery_value.php !');
+            console.log(response);
+        },
+        error: function(http, status, error) {
+            alert('ERROR: '+error);
+        },
+    })
+}

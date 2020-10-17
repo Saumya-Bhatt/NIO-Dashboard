@@ -1,5 +1,7 @@
 import streamlit as st
+import mysql.connector
 import datetime
+import time
 import csv
 import os
 
@@ -34,5 +36,20 @@ def create_file(file_data):
     os.chdir('..')
     return None
 
-battery = 12
-dt = datetime.datetime.now()
+
+def get_battery_value():
+    mydb = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='nio_python'
+    )
+    mycursor = mydb.cursor()
+    query = "SELECT * FROM battery_value ORDER BY id DESC LIMIT 1"
+    mycursor.execute(query)
+    returned_data = mycursor.fetchall()
+    mydb.close()
+    mycursor.close()
+    return returned_data[0][1]
+
+battery = get_battery_value()

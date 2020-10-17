@@ -16,21 +16,23 @@
 
 7. You will automatically taken to the 'trial Database'. On the topbar, there would be an option of 'Import'. Click on it.
 8. You will get an option to 'Choose file'. From the Folder 'SETUP' in this folder, choose and upload the file `mission_upload.db`.
-9. Repeate the steps from 7-8 for the remaining databses `boat_position.db`,`home_position.db`,`cbot_position.db` as well.
+9. Repeate the steps from 7-8 for the remaining databses `boat_position.db`,`home_position.db`,`cbot_position.db`, `battery_value` as well.
 
 <br></br>
 
 # Setting up the application
 
-1. In the 'SETUP' folder, there's a file named requirements.txt which has all the required python libraries to run this application
-2. If you have Python Indexing Project Installed (PIP), in the command shell type
-`pip install -r /path/to/requirements.txt`
+1. If you have [pipenv](https://pypi.org/project/pipenv/) installed, just run `pipenv install`. It will automatically create a virtual environment inside your project and install all the required libraries.
 
-3. If PIP is not installed or there's a problem during setup, try installing the packages manually from the requirements.txt
+2. If you don't have pipenv installed, you can either install it using the command `pip install pipenv` and follow step 1.
+3. If you don't want to use pipenv, you can manually install the libraries using pip by running `pip install -r SETUP/requirements.txt` in the root directory of the project.
+
 
 <br></br>
 
 # Running the application
+
+__Note__: If you have installed the libraries using pipenv, you would first need to run `pipenv shell` in the root directory.
 
 In the __APP folder__, open the command shell and type `python run.py`. It should automatically show open the browser and display the dashboard and also display the network URL and the local URL.
 
