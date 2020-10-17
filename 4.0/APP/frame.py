@@ -35,21 +35,3 @@ def create_file(file_data):
         f.write(file_data.getvalue())
     os.chdir('..')
     return None
-
-
-def get_battery_value():
-    mydb = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='nio_python'
-    )
-    mycursor = mydb.cursor()
-    query = "SELECT * FROM battery_value ORDER BY id DESC LIMIT 1"
-    mycursor.execute(query)
-    returned_data = mycursor.fetchall()
-    mydb.close()
-    mycursor.close()
-    return returned_data[0][1]
-
-battery = get_battery_value()

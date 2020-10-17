@@ -17,7 +17,8 @@ from PIL import Image
 from cam import streamVideo
 from onlineMap import getOnlineMap
 from offlineMap import getOfflineMap
-from frame import newline, battery, data_frame, cleanFile
+from frame import newline, data_frame, cleanFile
+from text import kill_process, camera_instr, offline_map_instr
 from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty, sql_queries_dynamic
 from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
 
@@ -46,6 +47,7 @@ newline(2)
 
 dt_time = st.empty()
 dt_date = st.empty()
+kill_functions = st.empty()
 
 battery_status = st.sidebar.empty()
 battery_status_pg = st.sidebar.empty()
@@ -108,8 +110,7 @@ if st.sidebar.checkbox('Open Console',False,key=1):
     if st.checkbox('Open Offline Map',key='offline_map'):
 
         if st.checkbox('Read Instructions',False,key='inst'):
-            st.markdown('__1.__ Enter the file which contains the coordinates of the __top left__ and __bottom right__ points of the image to be used.')
-            st.markdown('__2.__ Make sure to delete any last images which might have been used as it might cause problems.')
+            st.markdown(offline_map_instr)
         newline(1)
         
 
@@ -175,7 +176,7 @@ st.sidebar.markdown('Upload mission files and send it to mission control to exec
 if st.sidebar.checkbox('Open Dashboard',False,key=2):
 
     st.subheader('Upload mission file')
-    st.markdown('Upload a mission file here. The current files in the database along with their time-stamp and status are shown below. Hover over the top right corner of the table to view it completely.')
+    st.markdown('Upload a mission file here. The current files in the database along with their time-stamp and status are shown below.')
 
     current_table = st.empty()
     current_table.table(current_uploads())
@@ -245,11 +246,7 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
     st.markdown('Send request to C-Bot to access its live stream and get current location')
 
     if st.checkbox('Read Instructions',False,key='cam_inst'):
-        st.markdown('__1__. Make sure that the browser and the bot are over the same network.')
-        st.markdown("__2__. Ensure that the 'IP WebCam' application has been installed on the bot.")
-        st.markdown('__3__. In a new tab enter the network URL (eg, 192.168.43.163:8080) and in the window select `Video Render` option as `Javascript`')
-        st.markdown('__4__.Enter the same network url (without http://) in the box below and press enter.')
-        st.markdown("__5__.A stream window will start in a new window. Press 'q' to exit")
+        st.markdown(camera_instr)
         newline(1)
 
     URL = st.text_input('Enter the url of the network stream : ')
@@ -261,20 +258,18 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
 
 
 
+
+
+
+
 #=============================================================================================
 #=============================== KILL TASKS ==================================================
 #=============================================================================================
 
-
 st.sidebar.markdown('### Stop Functions')
 st.sidebar.markdown('Do this if dashboard hangs')
 if st.sidebar.checkbox('Kill all processes'):
-    st.markdown('All functions connecting to the server side has been paused.')
-    st.markdown('1. Functionalities which involve connecting to the server side has been paused.')
-    st.markdown('2. You can open the consoles but the data displaying there will not be dynamically updated. Last called data would be displayed.')
-    st.markdown('3. Communication from the dashboard to the server is allowed but reverse is not true here.')
-    newline(1)
-    st.markdown('To restart the processes, toggle the `kill all processes` checkbox in the sidebar')
+    kill_functions.markdown(kill_process)
     st.stop()
 
 
