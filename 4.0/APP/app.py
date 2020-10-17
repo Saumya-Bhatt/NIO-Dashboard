@@ -18,7 +18,7 @@ from cam import streamVideo
 from onlineMap import getOnlineMap
 from offlineMap import getOfflineMap
 from frame import newline, battery, data_frame, cleanFile
-from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty
+from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty, sql_queries_dynamic
 from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
 
 
@@ -34,8 +34,11 @@ matplotlib.rc('font', **font)
 #video_bytes = video_file.read()
 
 
+#=============================================================================
+#========================== HEADERS ==========================================
+#=============================================================================
 
-#--------------------------HEADING--------------------------------------------
+
 st.title('CSIR - National Institute of Oceanography')
 st.subheader('Marine robot dashboard')
 
@@ -43,6 +46,11 @@ newline(2)
 
 dt_time = st.empty()
 dt_date = st.empty()
+
+battery_status = st.sidebar.empty()
+battery_status_pg = st.sidebar.empty()
+cmd_status = st.sidebar.empty()
+
 
 def get_time():
     get_current = datetime.datetime.now()
@@ -53,18 +61,29 @@ def get_date():
     today = datetime.date.today()
     return dt_date.markdown('__Date__ : %s'%today)
 
-st.sidebar.markdown('__Battery Status__ : %d %%'%battery)
-battery = st.sidebar.progress(battery)
+def get_battery_value():
+    query = "SELECT * FROM battery_value ORDER BY id DESC LIMIT 1"
+    returned_data = sql_queries_dynamic(query)
+    if len(returned_data) != 0:
+        bat_val = returned_data[0][1]
+        if isinstance(bat_val,int):
+            battery_status_pg.progress(bat_val)
+            return battery_status.markdown('__Battery Status__ : '+str(bat_val))
+        else:
+            return battery_status.markdown('__Battery Status__ : NaN')
+    else:
+        return cmd_status.error('BATTERY TABLE ENTRY IS NULL')
 
-cmd_status = st.sidebar.empty()
 
 
 
 
 
+#=========================================================================================
+#=============================== POSITION (MAP) ==========================================
+#=========================================================================================
 
 
-#--------------------------POSITION--------------------------------------------
 st.sidebar.markdown('### Position')
 st.sidebar.markdown('Represents the current location of the C-Bot, home and the boat')
 if st.sidebar.checkbox('Open Console',False,key=1):
@@ -139,7 +158,17 @@ if st.sidebar.checkbox('Open Console',False,key=1):
             
 
 
-#--------------------------MISSION CONTROL--------------------------------------------
+
+
+
+
+
+
+#=====================================================================================================
+#===================================== MISSION CONTROL ===============================================
+#=====================================================================================================
+
+
 st.sidebar.markdown('### Mission Control')
 st.sidebar.markdown('Upload mission files and send it to mission control to execute/abort it.')
 
@@ -202,7 +231,11 @@ if st.sidebar.checkbox('Open Dashboard',False,key=2):
 
 
 
-#--------------------------CAMERA--------------------------------------------
+#=====================================================================================================
+#========================================== CAMERA FEED ==============================================
+#=====================================================================================================
+
+
 st.sidebar.markdown('### Camera Feed')
 st.sidebar.markdown('Get the live camera feed from the bot')
 
@@ -228,24 +261,34 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
 
 
 
+#=============================================================================================
+#=============================== KILL TASKS ==================================================
+#=============================================================================================
+
+
 st.sidebar.markdown('### Stop Functions')
 st.sidebar.markdown('Do this if dashboard hangs')
 if st.sidebar.checkbox('Kill all processes'):
     st.markdown('All functions connecting to the server side has been paused.')
     st.markdown('1. Functionalities which involve connecting to the server side has been paused.')
-    st.markdown('2. You can open the consoles but the data displaying there will not be dynamically updated and sent to the server.')
+    st.markdown('2. You can open the consoles but the data displaying there will not be dynamically updated. Last called data would be displayed.')
     st.markdown('3. Communication from the dashboard to the server is allowed but reverse is not true here.')
     newline(1)
     st.markdown('To restart the processes, toggle the `kill all processes` checkbox in the sidebar')
     st.stop()
 
+
+
+
+#================================================================================================
+#=============================== TASK SCHEDULING CALLS ==========================================
+#================================================================================================
+
+
 schedule.every(1).seconds.do(get_time)
 schedule.every(1).seconds.do(get_date)
-
+schedule.every(5).seconds.do(get_battery_value)
 
 while True: 
-  
-    # Checks whether a scheduled task  
-    # is pending to run or not 
     schedule.run_pending() 
     time.sleep(1)
