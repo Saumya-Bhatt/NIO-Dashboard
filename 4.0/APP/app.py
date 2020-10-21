@@ -1,11 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import pydeck as pdk
 import matplotlib.pyplot as plt
 
 import matplotlib
 import schedule
 import datetime
+import sqlite3
 import time
 import sys
 import os
@@ -15,10 +17,9 @@ import json
 
 from PIL import Image
 from cam import streamVideo
+from streamlit import caching
 from onlineMap import getOnlineMap
-from offlineMap import getOfflineMap
-from frame import newline, data_frame, cleanFile
-from text import kill_process, camera_instr, offline_map_instr
+from frame import newline, data_frame, cleanFile, kill_process, camera_instr, offline_map_instr
 from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty, sql_queries_dynamic
 from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
 
@@ -111,39 +112,79 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
         if st.checkbox('Read Instructions',False,key='inst'):
             st.markdown(offline_map_instr)
-        newline(1)
-        
-
-        REFLOC = st.file_uploader('Enter a reference location file [.TXT]',type='txt',key='refloc')
-        if REFLOC is not None:
-            data = cleanFile(REFLOC)
-
-        newline(1)
-
-        if st.button('Clear Buffer image'):
+        if st.button('Clear Buffer data'):
             try:
                 os.system('del UPLOAD/buffer.png')
                 uploaded_file = None
                 st.success('You are good to go')
             except:
                 st.warning('No image currently in use')
-        st.markdown('Not clearing buffer image before proceeding will show the previously used image')
+        st.markdown('Not clearing buffer data before proceeding will show the previously used data')
+        
 
-        newline(1)
-
-
+        REFLOC = st.file_uploader('Enter a reference location file [.TXT]',type='txt',key='refloc')
         UPLOADED_FILE = st.file_uploader("Choose an image file [.PNG]", type="png", key='map')
-        if UPLOADED_FILE is not None:
 
-            fig, scale_x, scale_y = getOfflineMap(UPLOADED_FILE, data, HOME_POSITION, BOAT_POSITION, CBOT_POSITION)
-            st.pyplot(fig)
+        if REFLOC is not None and UPLOADED_FILE is not None:
 
-            st.markdown('__X-Axis__ : _1 unit = %f m_ &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp&nbsp __Y-Axis__ : _1 unit = %f m_'%((1/scale_x),(1/scale_y)))
-            newline(1)
+            data = cleanFile(REFLOC)
+            conn = sqlite3.connect('refloc.db')
+            cur = conn.cursor()
+            cur.execute('INSERT INTO reference_location VALUES (?,?,?)',(1,data[0][0],data[0][1]))
+            conn.commit()
+            cur.execute('INSERT INTO reference_location VALUES (?,?,?)',(2,data[1][0],data[1][1]))
+            conn.commit()
+            conn.close()
 
+
+            offline_map = st.empty
             st.subheader('Coordinates and markers')
             st.markdown('The coordinates are given below are in LatLong but have been converted to UTM for dispalying on map.')
-            st.dataframe(DATA_INDEX)
+            offline_locations = st.empty()
+
+            newline(1)
+
+            st.markdown('The map will open shortly in a new window')
+            try:
+                BASEWIDTH = 1500
+                IMG_BUFFER = Image.open(UPLOADED_FILE)
+                WPERCENT = (BASEWIDTH/float(IMG_BUFFER.size[0]))
+                H_SIZE = int((float(IMG_BUFFER.size[1])*float(WPERCENT)))
+                IMG_BUFFER = IMG_BUFFER.resize((BASEWIDTH,H_SIZE), Image.ANTIALIAS)
+
+                IMG_BUFFER.save('UPLOAD/buffer.png')
+                os.system('python offlineMap.py')
+            except:
+                st.error('There was a problem reaching the server!')
+
+#            def get_offline_map():
+#                get_home = get_home_pos()
+#                get_boat = get_boat_pos()
+#                get_cbot = get_cbot_pos()
+#
+#                HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
+#                BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
+#                CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+#
+#
+#                DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+#                offline_locations.dataframe(DATA_INDEX)
+#
+#                return None
+
+
+#            schedule.every(5).seconds.do(get_offline_map)
+#            while True:
+#                schedule.run_pending()
+#                time.sleep(1)
+
+            
+            newline(1)
+
+
+
+    newline(2)
+
 
 
     
@@ -160,19 +201,23 @@ if st.sidebar.checkbox('Open Console',False,key=1):
             get_boat = get_boat_pos()
             get_cbot = get_cbot_pos()
 
-            HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
-            BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
-            CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+            HOME_POSITION = [float(get_home[2]),float(get_home[1])]   
+            BOAT_POSITION = [float(get_boat[2]),float(get_boat[1])]
+            CBOT_POSITION = [float(get_cbot[2]),float(get_cbot[1])]
+
+            map_info = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
+            online_map.pydeck_chart(map_info)
 
             DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
-            my_map = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
             online_locations.dataframe(DATA_INDEX)
-            return online_map.pydeck_chart(my_map)
+            time.sleep(4)
 
-        #st.pydeck_chart(my_map)
+            return None
 
-            
-
+        schedule.every(2).seconds.do(get_online_map)
+        while True: 
+            schedule.run_pending() 
+            time.sleep(1)
 
 
 
@@ -285,6 +330,7 @@ st.sidebar.markdown('### Stop Functions')
 st.sidebar.markdown('Do this if dashboard hangs')
 if st.sidebar.checkbox('Kill all processes'):
     kill_functions.markdown(kill_process)
+    caching.clear_cache()
     st.stop()
 
 
@@ -298,7 +344,6 @@ if st.sidebar.checkbox('Kill all processes'):
 schedule.every(1).seconds.do(get_time)
 schedule.every(1).seconds.do(get_date)
 schedule.every(5).seconds.do(get_battery_value)
-schedule.every(5).seconds.do(get_online_map)
 
 while True: 
     schedule.run_pending() 

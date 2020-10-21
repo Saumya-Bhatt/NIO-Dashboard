@@ -1,18 +1,35 @@
 import utm
+import sqlite3
+import schedule
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
+from posSQL import get_boat_pos, get_home_pos, get_cbot_pos
 
 
-def getOfflineMap(UPLOADED_FILE, refloc, HOME_POSITION, BOAT_POSITION, CBOT_POSITION):
+def getOfflineMap():
 
-    BASEWIDTH = 1500
-    IMG_BUFFER = Image.open(UPLOADED_FILE)
-    WPERCENT = (BASEWIDTH/float(IMG_BUFFER.size[0]))
-    H_SIZE = int((float(IMG_BUFFER.size[1])*float(WPERCENT)))
-    IMG_BUFFER = IMG_BUFFER.resize((BASEWIDTH,H_SIZE), Image.ANTIALIAS)
+    conn = sqlite3.connect('refloc.db')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM reference_location')
+    records = cur.fetchall()
+    refloc = []
+    for row in records:
+        pos = [row[1],row[2]]
+        refloc.append(pos)
+    conn.close()
 
-    IMG_BUFFER.save('UPLOAD/buffer.png')
+
+    get_home = get_home_pos()
+    get_boat = get_boat_pos()
+    get_cbot = get_cbot_pos()
+
+    HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
+    BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
+    CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+
+
     FILE_PATH = 'UPLOAD/buffer.png'
 
     image = Image.open(FILE_PATH)
@@ -44,4 +61,10 @@ def getOfflineMap(UPLOADED_FILE, refloc, HOME_POSITION, BOAT_POSITION, CBOT_POSI
     ax.scatter(latitude[2],longitude[2],color='red',s=20)
     ax.imshow(arr,extent=bounding_box,cmap='gray')
 
-    return fig, scale_x, scale_y
+    plt.show()
+    return None
+
+#schedule.every(5).seconds.do(getOfflineMap)
+#while True: 
+    schedule.run_pending() 
+    time.sleep(1)
