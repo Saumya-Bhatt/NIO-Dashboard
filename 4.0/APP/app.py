@@ -47,6 +47,7 @@ kill_functions = st.empty()
 
 battery_status = st.sidebar.empty()
 battery_status_pg = st.sidebar.empty()
+pitch_and_yaw_status = st.sidebar.empty()
 cmd_status = st.sidebar.empty()
 
 
@@ -59,18 +60,42 @@ def get_date():
     today = datetime.date.today()
     return dt_date.markdown('__Date__ : %s'%today)
 
-def get_battery_value():
-    query = "SELECT * FROM battery_value ORDER BY id DESC LIMIT 1"
-    returned_data = sql_queries_dynamic(query)
-    if len(returned_data) != 0:
-        bat_val = returned_data[0][1]
+
+def get_integer_values():
+
+    query0 = "SELECT * FROM battery_value ORDER BY id DESC LIMIT 1"
+    query1 = "SELECT * FROM pitch_value ORDER BY id DESC LIMIT 1"
+    query2 = "SELECT * FROM yaw_value ORDER BY id DESC LIMIT 1"
+
+    returned_battery_data = sql_queries_dynamic(query0)
+    returned_data_pitch = sql_queries_dynamic(query1)
+    returned_data_yaw = sql_queries_dynamic(query2)
+
+    if len(returned_battery_data) != 0:
+        bat_val = returned_battery_data[0][1]
         if isinstance(bat_val,int):
             battery_status_pg.progress(bat_val)
-            return battery_status.markdown('__Battery Status__ : '+str(bat_val)+' %')
+            battery_status.markdown('__Battery Status__ : '+str(bat_val)+' %')
         else:
-            return battery_status.markdown('__Battery Status__ : NaN')
+            battery_status.markdown('__Battery Status__ : NaN')
     else:
-        return cmd_status.error('BATTERY TABLE ENTRY IS NULL')
+        cmd_status.error('BATTERY TABLE ENTRY IS NULL')
+
+    if len(returned_data_pitch) == 0:
+        yaw_val = returned_data_yaw[0][1]
+        pitch_and_yaw_status.markdown('__Pitch__ : NULL &nbsp&nbsp&nbsp&nbsp&nbsp __Yaw__ : {}'.format(str(yaw_val)))
+    elif len(returned_data_yaw) == 0:
+        pitch_val = returned_data_pitch[0][1]
+        pitch_and_yaw_status.markdown('__Pitch__ : {} &nbsp&nbsp&nbsp&nbsp&nbsp __Yaw__ : NULL'.format(str(pitch_val)))
+    else:
+        yaw_val = returned_data_yaw[0][1]
+        pitch_val = returned_data_pitch[0][1]
+        pitch_and_yaw_status.markdown('__Pitch__ : {} &nbsp&nbsp&nbsp&nbsp&nbsp __Yaw__ : {}'.format(str(pitch_val),str(yaw_val)))
+
+    return None
+
+        
+
 
 
 
@@ -331,11 +356,11 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
 #=============================== KILL TASKS ==================================================
 #=============================================================================================
 
-if st.sidebar.button('Kill all processes'):
+if st.sidebar.button('Kill all process'):
     kill_functions.markdown(kill_process)
     schedule.cancel_job(get_time)
     schedule.cancel_job(get_date)
-    schedule.cancel_job(get_battery_value)
+    schedule.cancel_job(get_integer_values)
     caching.clear_cache()
     st.stop()
 
@@ -346,10 +371,12 @@ if st.sidebar.button('Kill all processes'):
 #=============================== TASK SCHEDULING CALLS ==========================================
 #================================================================================================
 
+get_date()
+get_integer_values()
 
 schedule.every(1).seconds.do(get_time)
-schedule.every(1).seconds.do(get_date)
-schedule.every(5).seconds.do(get_battery_value)
+schedule.every(24).hours.do(get_date)
+schedule.every(10).seconds.do(get_integer_values)
 
 while True: 
     schedule.run_pending() 

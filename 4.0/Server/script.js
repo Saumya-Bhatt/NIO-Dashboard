@@ -121,3 +121,47 @@ function battery_status() {
         },
     })
 }
+
+//=================================================
+//=============== PITCH STATUS ====================
+//=================================================
+
+function pitch_value() {
+    var pitch_value = $("#pitch").val();
+    console.log(pitch_value)
+    $.ajax({
+        url: "http://localhost/NIO/4.0/scripts/integer_values/pitch_value.php",
+        data: {pitch_value: pitch_value},
+        type: 'GET',
+        dataType: 'text',
+        success: function(response, status, http) {
+            console.log('Updated pitch value sent to pitch_value.php !');
+            console.log(response);
+        },
+        error: function(http, status, error) {
+            alert('ERROR: '+error);
+        },
+    })
+}
+
+//=================================================
+//================= YAW STATUS ====================
+//=================================================
+
+function yaw_value() {
+    var yaw_value = $("#yaw").val();
+    console.log(yaw_value)
+    $.ajax({
+        url: "http://localhost/NIO/4.0/scripts/integer_values/yaw_value.php",
+        data: {yaw_value: yaw_value},
+        type: 'GET',
+        dataType: 'text',
+        success: function(response, status, http) {
+            console.log('Updated yaw value sent to yaw_value.php !');
+            console.log(response);
+        },
+        error: function(http, status, error) {
+            alert('ERROR: '+error);
+        },
+    })
+}
