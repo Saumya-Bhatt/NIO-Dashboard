@@ -16,7 +16,7 @@
 
 7. You will automatically taken to the 'trial Database'. On the topbar, there would be an option of 'Import'. Click on it.
 8. You will get an option to 'Choose file'. From the Folder 'SETUP' in this folder, choose and upload the file `mission_upload.db`.
-9. Repeate the steps from 7-8 for the remaining databses `boat_position.db`,`home_position.db`,`cbot_position.db`, `battery_value` as well.
+9. Repeate the steps from 7-8 for the remaining databses given in the SETUP folder.
 
 <br></br>
 
