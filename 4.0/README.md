@@ -34,7 +34,7 @@
 
 __Note__: If you have installed the libraries using pipenv, you would first need to run `pipenv shell` in the root directory.
 
-In the __APP folder__, open the command shell and type `python run.py`. It should automatically show open the browser and display the dashboard and also display the network URL and the local URL.
+In the __APP folder__, open the command shell and type `streamlit run app.py`. It should automatically show open the browser and display the dashboard and also display the network URL and the local URL.
 
 ![Running the application](Extra/Images/running_app.png)
 

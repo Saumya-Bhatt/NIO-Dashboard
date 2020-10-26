@@ -76,6 +76,6 @@ __A few details:__
 
 # Upcomming updates
 
-Will be integrating external executionary unit; Terminal.exe to get position of bot in realtime using live GPS. Currently maps cannot be updated in realtime to show position and does not show history of previous command/locations; all of which would be a feature of 5.0. It will also include an error-logging system to show and log realtime commands and traceback errors for better debugging experience.
+Will be integrating external executionary unit; Terminal.exe to get position of bot in realtime using live GPS. Also to add include an error-logging system to show and log realtime commands and traceback errors for better debugging experience.
 
 __Note__: After the image calling system for live stream videos for v3.0, the javascript build would be discontinued. All successive builds would take place on top of v4.0 only.

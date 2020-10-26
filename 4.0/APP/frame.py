@@ -5,6 +5,8 @@ import time
 import csv
 import os
 
+from PIL import Image
+
 def newline(n):
     i =0
     while i<=n:
@@ -36,15 +38,29 @@ def create_file(file_data):
     os.chdir('..')
     return None
 
+def saveImage(UPLOADED_FILE):
+    BASEWIDTH = 1500
+    IMG_BUFFER = Image.open(UPLOADED_FILE)
+    WPERCENT = (BASEWIDTH/float(IMG_BUFFER.size[0]))
+    H_SIZE = int((float(IMG_BUFFER.size[1])*float(WPERCENT)))
+    IMG_BUFFER = IMG_BUFFER.resize((BASEWIDTH,H_SIZE), Image.ANTIALIAS)
+    FILE_PATH = 'UPLOAD/buffer.png'
+    IMG_BUFFER.save(FILE_PATH)
+
+    image = Image.open(FILE_PATH)
+    width,height = image.size
+    map_plot = Image.open(FILE_PATH).convert("L")
+    return width,height,map_plot
+
 
 kill_process = '''
-        All functions connecting to the server side has been paused.
+        All functions connecting to the server side has been paused. If the dashboard is malfunctioning, press `ctrl + shft + r` to restart the browser. If any problems still persist, try shutting down the serve and start again.
         \n
         1. Functionalities which involve connecting to the server side has been paused.
         2. You can open the consoles but the data displaying there will not be dynamically updated. Last called data would be displayed.
         3. Communication from the dashboard to the server is allowed but reverse is not true here.
         \n
-        To restart the processes, toggle the `kill all processes` checkbox in the sidebar
+        Opening any of the consoles will restart the processes.
         '''
 
 camera_instr = '''

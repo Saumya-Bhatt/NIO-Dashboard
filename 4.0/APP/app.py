@@ -15,11 +15,10 @@ import cv2
 import utm
 import json
 
-from PIL import Image
 from cam import streamVideo
 from streamlit import caching
 from onlineMap import getOnlineMap
-from frame import newline, data_frame, cleanFile, kill_process, camera_instr, offline_map_instr
+from frame import newline, data_frame, cleanFile, kill_process, camera_instr, offline_map_instr, saveImage
 from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty, sql_queries_dynamic
 from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
 
@@ -30,10 +29,6 @@ font = {'family' : 'DejaVu Sans',
         'size'   : 5}
 matplotlib.rc('font', **font)
 
-
-#--------------------------VIDEO--------------------------------------------
-#video_file = open('video.mp4','rb')
-#video_bytes = video_file.read()
 
 
 #=============================================================================
@@ -71,7 +66,7 @@ def get_battery_value():
         bat_val = returned_data[0][1]
         if isinstance(bat_val,int):
             battery_status_pg.progress(bat_val)
-            return battery_status.markdown('__Battery Status__ : '+str(bat_val))
+            return battery_status.markdown('__Battery Status__ : '+str(bat_val)+' %')
         else:
             return battery_status.markdown('__Battery Status__ : NaN')
     else:
@@ -92,8 +87,9 @@ st.sidebar.markdown('Represents the current location of the C-Bot, home and the 
 if st.sidebar.checkbox('Open Console',False,key=1):
 
 
-    st.subheader('Location')
-    st.markdown('Represents the current location of the C-Bot, home and the boat. Upload the text file containing locations of the places to be represented. The locations should be in LatLong.')
+    st.subheader('Position Console')
+    st.markdown('Represents the current location of the C-Bot, home and the boat.')
+    st.markdown('__Note__: Toggeling between offline and online mode may cause the dashboard to hang up.')
     newline(1)
 
     get_home = get_home_pos()
@@ -107,8 +103,8 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
     DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
 
-
-    if st.checkbox('Open Offline Map',key='offline_map'):
+    startOfflineMap = st.checkbox('Open Offline Map',key='offline_map')
+    if startOfflineMap:
 
         if st.checkbox('Read Instructions',False,key='inst'):
             st.markdown(offline_map_instr)
@@ -127,65 +123,71 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
         if REFLOC is not None and UPLOADED_FILE is not None:
 
-            data = cleanFile(REFLOC)
-            conn = sqlite3.connect('refloc.db')
-            cur = conn.cursor()
-            cur.execute('INSERT INTO reference_location VALUES (?,?,?)',(1,data[0][0],data[0][1]))
-            conn.commit()
-            cur.execute('INSERT INTO reference_location VALUES (?,?,?)',(2,data[1][0],data[1][1]))
-            conn.commit()
-            conn.close()
 
-
-            offline_map = st.empty
             st.subheader('Coordinates and markers')
             st.markdown('The coordinates are given below are in LatLong but have been converted to UTM for dispalying on map.')
             offline_locations = st.empty()
 
-            newline(1)
-
-            st.markdown('The map will open shortly in a new window')
-            try:
-                BASEWIDTH = 1500
-                IMG_BUFFER = Image.open(UPLOADED_FILE)
-                WPERCENT = (BASEWIDTH/float(IMG_BUFFER.size[0]))
-                H_SIZE = int((float(IMG_BUFFER.size[1])*float(WPERCENT)))
-                IMG_BUFFER = IMG_BUFFER.resize((BASEWIDTH,H_SIZE), Image.ANTIALIAS)
-
-                IMG_BUFFER.save('UPLOAD/buffer.png')
-                os.system('python offlineMap.py')
-            except:
-                st.error('There was a problem reaching the server!')
-
-#            def get_offline_map():
-#                get_home = get_home_pos()
-#                get_boat = get_boat_pos()
-#                get_cbot = get_cbot_pos()
-#
-#                HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
-#                BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
-#                CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
-#
-#
-#                DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
-#                offline_locations.dataframe(DATA_INDEX)
-#
-#                return None
+            data = cleanFile(REFLOC)
+            refloc = [[data[0][0],data[0][1]],[data[1][0],data[1][1]]]
+            loc1 = utm.from_latlon(float(refloc[0][0]),float(refloc[0][1]))
+            loc2 = utm.from_latlon(float(refloc[1][0]),float(refloc[1][1]))
 
 
-#            schedule.every(5).seconds.do(get_offline_map)
-#            while True:
-#                schedule.run_pending()
-#                time.sleep(1)
+            width, height, map_plot = saveImage(UPLOADED_FILE)
+            scale_x = width/abs(loc1[0]-loc2[0])
+            scale_y = height/abs(loc1[1]-loc2[1])
+            arr = np.asarray(map_plot)
+            bounding_box = (width,0,height,0)
+        
+            temp = st.empty()
+            def animateOffline():
+                fig = plt.figure()
+                ax = fig.add_subplot()
 
-            
-            newline(1)
+                # getting data from database (has to be updated in realtime)
+                get_home = get_home_pos()
+                get_boat = get_boat_pos()
+                get_cbot = get_cbot_pos()
+
+                try:
+                    HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
+                    BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
+                    CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+
+                    home = utm.from_latlon(HOME_POSITION[1],HOME_POSITION[0])
+                    boat = utm.from_latlon(BOAT_POSITION[1],BOAT_POSITION[0])
+                    cbot = utm.from_latlon(CBOT_POSITION[1],CBOT_POSITION[0])
+
+                    latitude = [(loc1[0]-home[0])*scale_x+width,(loc1[0]-boat[0])*scale_x+width,(loc1[0]-cbot[0])*scale_x+width]
+                    longitude = [(loc2[1]-home[1])*scale_y+height,(loc2[1]-boat[1])*scale_y+height,(loc2[1]-cbot[1])*scale_y+height]
+
+                    DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+                    offline_locations.dataframe(DATA_INDEX)
+
+                    # plotting the data onto the figure
+                    ax.scatter(latitude[0],longitude[0],color='green',s=20, label='home position')
+                    ax.scatter(latitude[1],longitude[1],color='blue',s=20, label='boat position')
+                    ax.scatter(latitude[2],longitude[2],color='red',s=20, label='c-bot position')
+                    ax.imshow(arr,extent=bounding_box,cmap='gray')
+                    plt.legend(loc=2)
+                    temp.pyplot(fig)
+                    time.sleep(3)
+                    plt.close()
+
+                except:
+                    st.error('There are currently no positions in the locations database. First add them at the server-side panel.')
+
+                return None
+
+            schedule.every(2).seconds.do(animateOffline)
+            while True: 
+                schedule.run_pending() 
+                time.sleep(2)
 
 
 
-    newline(2)
-
-
+    newline(1)
 
     
     if st.checkbox('Open online Map',key='online_map'):
@@ -201,16 +203,19 @@ if st.sidebar.checkbox('Open Console',False,key=1):
             get_boat = get_boat_pos()
             get_cbot = get_cbot_pos()
 
-            HOME_POSITION = [float(get_home[2]),float(get_home[1])]   
-            BOAT_POSITION = [float(get_boat[2]),float(get_boat[1])]
-            CBOT_POSITION = [float(get_cbot[2]),float(get_cbot[1])]
+            try:
+                HOME_POSITION = [float(get_home[2]),float(get_home[1])]   
+                BOAT_POSITION = [float(get_boat[2]),float(get_boat[1])]
+                CBOT_POSITION = [float(get_cbot[2]),float(get_cbot[1])]
 
-            map_info = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
-            online_map.pydeck_chart(map_info)
+                map_info = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
+                online_map.pydeck_chart(map_info)
 
-            DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
-            online_locations.dataframe(DATA_INDEX)
-            time.sleep(4)
+                DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+                online_locations.dataframe(DATA_INDEX)
+                time.sleep(4)
+            except:
+                st.error('There are currently no positions in the locations database. First add them at the server-side panel.')
 
             return None
 
@@ -326,10 +331,11 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
 #=============================== KILL TASKS ==================================================
 #=============================================================================================
 
-st.sidebar.markdown('### Stop Functions')
-st.sidebar.markdown('Do this if dashboard hangs')
-if st.sidebar.checkbox('Kill all processes'):
+if st.sidebar.button('Kill all processes'):
     kill_functions.markdown(kill_process)
+    schedule.cancel_job(get_time)
+    schedule.cancel_job(get_date)
+    schedule.cancel_job(get_battery_value)
     caching.clear_cache()
     st.stop()
 
