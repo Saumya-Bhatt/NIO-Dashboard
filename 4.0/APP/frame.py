@@ -1,4 +1,3 @@
-import streamlit as st
 import mysql.connector
 import datetime
 import time
@@ -7,18 +6,11 @@ import os
 
 from PIL import Image
 
-def newline(n):
-    i =0
-    while i<=n:
-        st.markdown('\n')
-        i+=1
 
 def cleanFile(file):
     data = file.readlines()
     reader = csv.reader(data)
-    temp = []
-    for row in reader:
-        temp.append(row)
+    temp = [row for row in reader]
     return temp
 
 def data_frame(data):
@@ -52,30 +44,47 @@ def saveImage(UPLOADED_FILE):
     map_plot = Image.open(FILE_PATH).convert("L")
     return width,height,map_plot
 
+def positionFrame(getHome,getBoat,getCbot,reverse=False):
+    if not reverse:
+        homePos = [float(getHome[1]),float(getHome[2])]
+        boatPos = [float(getBoat[1]),float(getBoat[2])]
+        cbotPos = [float(getCbot[1]),float(getCbot[2])]
+        return [homePos,boatPos,cbotPos]
+    else:
+        homePos = [float(getHome[2]),float(getHome[1])]
+        boatPos = [float(getBoat[2]),float(getBoat[1])]
+        cbotPos = [float(getCbot[2]),float(getCbot[1])]
+        return [homePos,boatPos,cbotPos]
 
-kill_process = '''
-        All functions connecting to the server side has been paused. If the dashboard is malfunctioning, press `ctrl + shft + r` to restart the browser. If any problems still persist, try shutting down the serve and start again.
-        \n
-        1. Functionalities which involve connecting to the server side has been paused.
-        2. You can open the consoles but the data displaying there will not be dynamically updated. Last called data would be displayed.
-        3. Communication from the dashboard to the server is allowed but reverse is not true here.
-        \n
-        Opening any of the consoles will restart the processes.
-        '''
+def sql_queries_static(query,param1=None,param2=None):
+    mydb = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='nio_python'
+    )
+    mycursor = mydb.cursor()
+    if param1 is None and param2 is None:
+        mycursor.execute(query)
+    else:
+        mycursor.execute(query%(param1,param2))
+    mydb.commit()
+    mydb.close()
+    mycursor.close()
 
-camera_instr = '''
-        \n
-        __1__. Make sure that the browser and the bot are over the same network. \n
-        __2__. Ensure that the 'IP WebCam' application has been installed on the bot.\n
-        __3__. In a new tab enter the network URL (eg, 192.168.43.163:8080) and in the window select `Video Render` option as `Javascript`\n
-        __4__.Enter the same network url (without http://) in the box below and press enter.
-        __5__.A stream window will start in a new window. Press 'q' to exit
-        \n
-        '''
-
-offline_map_instr = '''
-        \n
-        __1.__ Enter the file which contains the coordinates of the __top left__ and __bottom right__ points of the image to be used.\n
-        __2.__ Make sure to delete any last images which might have been used as it might cause problems.
-        \n
-        '''
+def sql_queries_dynamic(query,param1=None,param2=None):
+    mydb = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='nio_python'
+    )
+    mycursor = mydb.cursor()
+    if param1 is None and param2 is None:
+        mycursor.execute(query)
+    else:
+        mycursor.execute(query%(param1,param2))
+    req_data = mycursor.fetchall()
+    mydb.close()
+    mycursor.close()
+    return req_data

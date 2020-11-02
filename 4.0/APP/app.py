@@ -1,33 +1,28 @@
+import matplotlib.pyplot as plt
 import streamlit as st
+import pydeck as pdk
 import pandas as pd
 import numpy as np
-import pydeck as pdk
-import matplotlib.pyplot as plt
 
 import matplotlib
 import schedule
 import datetime
-import sqlite3
+import logging
 import time
+import utm
+import cv2
 import sys
 import os
-import cv2
-import utm
-import json
 
-from cam import streamVideo
-from streamlit import caching
-from onlineMap import getOnlineMap
-from frame import newline, data_frame, cleanFile, kill_process, camera_instr, offline_map_instr, saveImage
-from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty, sql_queries_dynamic
+from fileSQL import upload_mission, run_mission, abort_mission, current_uploads, table_empty
+from frame import data_frame, cleanFile, saveImage, positionFrame, sql_queries_dynamic
 from posSQL import get_home_pos, get_boat_pos, get_cbot_pos
+from text import newline, MethodIntro, BigInst, Headers
+from onlineMap import getOnlineMap
+from streamlit import caching
+from cam import streamVideo
 
 
-st.set_option('deprecation.showfileUploaderEncoding', False)
-font = {'family' : 'DejaVu Sans',
-        'weight' : 'light',
-        'size'   : 5}
-matplotlib.rc('font', **font)
 
 
 
@@ -35,20 +30,33 @@ matplotlib.rc('font', **font)
 #========================== HEADERS ==========================================
 #=============================================================================
 
+st.set_option('deprecation.showfileUploaderEncoding', False)
+logging.getLogger('schedule').propagate = False
+font = {'family' : 'DejaVu Sans',
+        'weight' : 'light',
+        'size'   : 5}
+matplotlib.rc('font', **font)
 
-st.title('CSIR - National Institute of Oceanography')
-st.subheader('Marine robot dashboard')
+method = MethodIntro()
+instructions = BigInst()
+headers = Headers()
 
-newline(2)
-
+instructions.header()
 dt_time = st.empty()
 dt_date = st.empty()
-kill_functions = st.empty()
 
 battery_status = st.sidebar.empty()
 battery_status_pg = st.sidebar.empty()
 pitch_and_yaw_status = st.sidebar.empty()
 cmd_status = st.sidebar.empty()
+
+
+
+
+
+#=============================================================================
+#====================== SCHEDULE FUNCTIONS ===================================
+#=============================================================================
 
 
 def get_time():
@@ -59,7 +67,6 @@ def get_time():
 def get_date():
     today = datetime.date.today()
     return dt_date.markdown('__Date__ : %s'%today)
-
 
 def get_integer_values():
 
@@ -94,10 +101,6 @@ def get_integer_values():
 
     return None
 
-        
-
-
-
 
 
 
@@ -107,32 +110,22 @@ def get_integer_values():
 #=========================================================================================
 
 
-st.sidebar.markdown('### Position')
-st.sidebar.markdown('Represents the current location of the C-Bot, home and the boat')
+headers.position()
 if st.sidebar.checkbox('Open Console',False,key=1):
 
-
-    st.subheader('Position Console')
-    st.markdown('Represents the current location of the C-Bot, home and the boat.')
-    st.markdown('__Note__: Toggeling between offline and online mode may cause the dashboard to hang up.')
-    newline(1)
+    method.positionConsole()
 
     get_home = get_home_pos()
     get_boat = get_boat_pos()
     get_cbot = get_cbot_pos()
 
-    #latitude, longitude
-    HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
-    BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
-    CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
-
-    DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+    DATA_INDEX = pd.DataFrame(data_frame(positionFrame(get_home,get_boat,get_cbot)),index=['Longitude','Latitude','Marker'])
 
     startOfflineMap = st.checkbox('Open Offline Map',key='offline_map')
     if startOfflineMap:
 
         if st.checkbox('Read Instructions',False,key='inst'):
-            st.markdown(offline_map_instr)
+            instructions.offlineMapInstr()
         if st.button('Clear Buffer data'):
             try:
                 os.system('del UPLOAD/buffer.png')
@@ -148,9 +141,7 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
         if REFLOC is not None and UPLOADED_FILE is not None:
 
-
-            st.subheader('Coordinates and markers')
-            st.markdown('The coordinates are given below are in LatLong but have been converted to UTM for dispalying on map.')
+            headers.coordinates()
             offline_locations = st.empty()
 
             data = cleanFile(REFLOC)
@@ -176,9 +167,7 @@ if st.sidebar.checkbox('Open Console',False,key=1):
                 get_cbot = get_cbot_pos()
 
                 try:
-                    HOME_POSITION = [float(get_home[1]),float(get_home[2])]   
-                    BOAT_POSITION = [float(get_boat[1]),float(get_boat[2])]
-                    CBOT_POSITION = [float(get_cbot[1]),float(get_cbot[2])]
+                    HOME_POSITION, BOAT_POSITION, CBOT_POSITION = positionFrame(get_home, get_boat, get_cbot)
 
                     home = utm.from_latlon(HOME_POSITION[1],HOME_POSITION[0])
                     boat = utm.from_latlon(BOAT_POSITION[1],BOAT_POSITION[0])
@@ -187,7 +176,7 @@ if st.sidebar.checkbox('Open Console',False,key=1):
                     latitude = [(loc1[0]-home[0])*scale_x+width,(loc1[0]-boat[0])*scale_x+width,(loc1[0]-cbot[0])*scale_x+width]
                     longitude = [(loc2[1]-home[1])*scale_y+height,(loc2[1]-boat[1])*scale_y+height,(loc2[1]-cbot[1])*scale_y+height]
 
-                    DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+                    global DATA_INDEX
                     offline_locations.dataframe(DATA_INDEX)
 
                     # plotting the data onto the figure
@@ -205,22 +194,18 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
                 return None
 
-            schedule.every(2).seconds.do(animateOffline)
+            schedule.every(2).seconds.do(animateOffline).tag('offlineMap')
             while True: 
                 schedule.run_pending() 
                 time.sleep(2)
 
-
-
     newline(1)
 
-    
     if st.checkbox('Open online Map',key='online_map'):
         st.markdown('The dashboard will display the map of the last location file entered unless a new one is uploaded.')
 
         online_map = st.empty()
-        st.subheader('Coordinates and markers')
-        st.markdown('The coordinates are given below are in LatLong.')
+        headers.coordinates(offline=False)
         online_locations = st.empty()
 
         def get_online_map():
@@ -229,14 +214,12 @@ if st.sidebar.checkbox('Open Console',False,key=1):
             get_cbot = get_cbot_pos()
 
             try:
-                HOME_POSITION = [float(get_home[2]),float(get_home[1])]   
-                BOAT_POSITION = [float(get_boat[2]),float(get_boat[1])]
-                CBOT_POSITION = [float(get_cbot[2]),float(get_cbot[1])]
+                HOME_POSITION, BOAT_POSITION, CBOT_POSITION = positionFrame(get_home, get_boat, get_cbot, reverse=True)
 
                 map_info = getOnlineMap(HOME_POSITION,BOAT_POSITION,CBOT_POSITION)
                 online_map.pydeck_chart(map_info)
 
-                DATA_INDEX = pd.DataFrame(data_frame([HOME_POSITION,BOAT_POSITION,CBOT_POSITION]),index=['Latitude','Longitude','Marker'])
+                global DATA_INDEX
                 online_locations.dataframe(DATA_INDEX)
                 time.sleep(4)
             except:
@@ -244,12 +227,10 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 
             return None
 
-        schedule.every(2).seconds.do(get_online_map)
+        schedule.every(2).seconds.do(get_online_map).tag('onlineMap')
         while True: 
             schedule.run_pending() 
             time.sleep(1)
-
-
 
 
 
@@ -260,20 +241,15 @@ if st.sidebar.checkbox('Open Console',False,key=1):
 #=====================================================================================================
 
 
-st.sidebar.markdown('### Mission Control')
-st.sidebar.markdown('Upload mission files and send it to mission control to execute/abort it.')
-
+headers.missionControl()
 if st.sidebar.checkbox('Open Dashboard',False,key=2):
 
-    st.subheader('Upload mission file')
-    st.markdown('Upload a mission file here. The current files in the database along with their time-stamp and status are shown below.')
-
+    method.missionFile()
     current_table = st.empty()
     current_table.table(current_uploads())
     st.markdown('Press __ctrl + shift + r__ if the table does not refresh automatically.')
 
     upload_status = st.empty()
-
     uploaded_file = st.file_uploader("Choose a Mission file", type="txt")
 
     if st.button('Load Mission'):
@@ -321,23 +297,17 @@ if st.sidebar.checkbox('Open Dashboard',False,key=2):
 
 
 
-
 #=====================================================================================================
 #========================================== CAMERA FEED ==============================================
 #=====================================================================================================
 
 
-st.sidebar.markdown('### Camera Feed')
-st.sidebar.markdown('Get the live camera feed from the bot')
-
+headers.cameraFeed()
 if st.sidebar.checkbox('Open Dashboard', False,key=3):
-
-    st.subheader('Live Camera Feed')
-    st.markdown('Send request to C-Bot to access its live stream and get current location')
+    method.cameraConsole()
 
     if st.checkbox('Read Instructions',False,key='cam_inst'):
-        st.markdown(camera_instr)
-        newline(1)
+        instructions.cameraInstr()
 
     URL = st.text_input('Enter the url of the network stream : ')
     try:
@@ -350,19 +320,29 @@ if st.sidebar.checkbox('Open Dashboard', False,key=3):
 
 
 
-
-
 #=============================================================================================
 #=============================== KILL TASKS ==================================================
 #=============================================================================================
 
+
 if st.sidebar.button('Kill all process'):
-    kill_functions.markdown(kill_process)
+    instructions.killProcess()
     schedule.cancel_job(get_time)
     schedule.cancel_job(get_date)
     schedule.cancel_job(get_integer_values)
+    schedule.clear('datetime')
+    schedule.clear('integer')
+    try:
+        schedule.clear('offlineMap')
+    except:
+        print('Offline Mapping stopped')
+    try:
+        schedule.clear('onlineMap')
+    except:
+        print('Online Map Stopped')
     caching.clear_cache()
     st.stop()
+
 
 
 
@@ -371,12 +351,13 @@ if st.sidebar.button('Kill all process'):
 #=============================== TASK SCHEDULING CALLS ==========================================
 #================================================================================================
 
+
 get_date()
 get_integer_values()
 
-schedule.every(1).seconds.do(get_time)
-schedule.every(24).hours.do(get_date)
-schedule.every(10).seconds.do(get_integer_values)
+schedule.every(1).seconds.do(get_time).tag('datetime')
+schedule.every(24).hours.do(get_date).tag('datetime')
+schedule.every(10).seconds.do(get_integer_values).tag('integer')
 
 while True: 
     schedule.run_pending() 
