@@ -15,9 +15,11 @@ class MethodIntro():
 
     def positionConsole(self):
         st.subheader('Position Console')
-        st.markdown('Represents the current location of the C-Bot, home and the boat.')
-        st.markdown('__Note__: Toggeling between offline and online mode may cause the dashboard to hang up.')
-        newline(1)
+        st.markdown('''
+        Represents the current location of the C-Bot, home and the boat.
+        __Note__: Switching between offline and online mode may cause the dashboard to hang up.
+        \n
+        ''')
         return None
 
     def cameraConsole(self): 
@@ -29,27 +31,32 @@ class MethodIntro():
 class Headers():
 
     def position(self):
-        st.sidebar.markdown('### Position')
-        st.sidebar.markdown('Represents the current location of the C-Bot, home and the boat')
+        st.sidebar.markdown('''
+        ### Position
+        Represents the current location of the C-Bot, home and the boat.
+        ''')
         return None
 
     def coordinates(self,offline=True):
         st.subheader('Coordinates and markers')
         if offline:
             st.markdown('The coordinates are given below are in LatLong but have been converted to UTM for dispalying on map.')
-            return None
         else:
             st.markdown('The coordinates are given below are in LatLong.')
-            return None
+        return None
 
     def missionControl(self):
-        st.sidebar.markdown('### Mission Control')
-        st.sidebar.markdown('Upload mission files and send it to mission control to execute/abort it.')
+        st.sidebar.markdown('''
+        ### Mission Control
+        Upload mission files and send it to mission control to execute/abort it.
+        ''')
         return None
 
     def cameraFeed(Self):
-        st.sidebar.markdown('### Camera Feed')
-        st.sidebar.markdown('Get the live camera feed from the bot')
+        st.sidebar.markdown('''
+        ### Camera Feed
+        Get the live camera feed from the bot
+        ''')
         return None
 
 

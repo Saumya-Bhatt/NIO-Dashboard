@@ -85,6 +85,10 @@ The contents of the (longitude/latitude) should be in this manner in the refloc.
 
 <br></br>
 
+__Note__ : Continuously switching between the online and the offline map may cause the dashboard to hangup. If that happens, try to hit the 'kill processes' button or press `ctrl + shift + r`. If issue still occurs, close the application from the terminal and start again.
+
+<br></br>
+
 ## **File Upload**
 
 There's no need for any extra setup here. Just upload the file that you want to run. That file will get uploaded in the database __nio_python__ that was created earlier. The files from there could be easily recalled by running an SQL script on the server side. The table also has a column for file status (running/uploaded/aborted). The server side script could read that and change functions accordingly.
