@@ -73,6 +73,7 @@ def get_integer_values():
     query0 = "SELECT * FROM battery_value ORDER BY id DESC LIMIT 1"
     query1 = "SELECT * FROM pitch_value ORDER BY id DESC LIMIT 1"
     query2 = "SELECT * FROM yaw_value ORDER BY id DESC LIMIT 1"
+    query3 = "SELECT * FROM depth ORDER BY id DESC LIMIT 1"
 
     returned_battery_data = sql_queries_dynamic(query0)
     returned_data_pitch = sql_queries_dynamic(query1)

@@ -22,7 +22,8 @@
 
 # Setting up the application
 
-1. If you have [pipenv](https://pypi.org/project/pipenv/) installed, just run `pipenv install`. It will automatically create a virtual environment inside your project and install all the required libraries.
+1. If you have [pipenv](https://pypi.org/project/pipenv/) installed, first run `pipenv shell`. It will automatically create a virtual environment inside your project.
+2. Then run `pipenv install` to install the required libraries.
 
 2. If you don't have pipenv installed, you can either install it using the command `pip install pipenv` and follow step 1.
 3. If you don't want to use pipenv, you can manually install the libraries using pip by running `pip install -r SETUP/requirements.txt` in the root directory of the project.
