@@ -33,6 +33,10 @@ class SessionManager():
         except:
             pass
 
+    def destroyAllSessions(self):
+        query = 'DELETE FROM sessions'
+        sqlQueries(database=self.database, query=query, override=True)
+
 
 def newline(x):
     for _ in range(x):

@@ -1,4 +1,4 @@
-from os import stat
+#from os import stat
 import streamlit as st
 import pandas as pd
 #st.set_page_config(layout="wide")
@@ -81,19 +81,25 @@ instance_expander = st.beta_expander("⚙️ AUV Instance generation and monitor
 with instance_expander:
     clicked = loginInstance()
 
-st.sidebar.header('Currently running instance :')
-sessionStatus = st.sidebar.empty()
-if session.sessionStatus():
-    sessionStatus.markdown('Session Token status : ✅ RUNNING')
-else:
-    sessionStatus.markdown('Session Token status : 🟠 NOT SET')
+st.sidebar.header('Instance Monitor')
 st.sidebar.markdown('Name : &nbsp&nbsp&nbsp'+AUV_BOT_NAME)
 st.sidebar.markdown('Reference ID : &nbsp&nbsp'+AUV_BOT_ID)
+sessionStatus = st.sidebar.empty()
+if session.sessionStatus():
+    sessionStatus.markdown('Session Token Status : ✅ RUNNING')
+else:
+    sessionStatus.markdown('Session Token status : 🟠 NOT SET')
+cachedSessions = st.sidebar.checkbox('Destroy cached sessions')
 if st.sidebar.button('Remove current session'):
     if session.sessionStatus():
-        session.deleteSession()
-        sessionStatus.markdown('Session Token status : 🟠 NOT SET')
-        status.warning('Current session token was destroyed')
+        if cachedSessions:
+            session.destroyAllSessions()
+            status.warning('All session tokens destroyed')
+            sessionStatus.markdown('Session Token Status : 🟥 DESTROYED')
+        else:
+            session.deleteSession()
+            sessionStatus.markdown('Session Token Status : 🟠 NOT SET')
+            status.warning('Current session token was destroyed')
     else:
         status.info('There is no session currently in use')
 
@@ -128,6 +134,5 @@ else:
     pass
 
 
-st.sidebar.markdown('\n')
 st.sidebar.markdown('_Press if dashboard overloads_')
 st.sidebar.button('Kill all processes')
