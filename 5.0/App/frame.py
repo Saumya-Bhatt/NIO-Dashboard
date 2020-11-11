@@ -38,9 +38,16 @@ class SessionManager():
         sqlQueries(database=self.database, query=query, override=True)
 
 
-def newline(x):
-    for _ in range(x):
-        st.markdown('\n')
+def newline(x, sidebar=False, element=None):
+    if element != None:
+        for _ in range(x):
+            element.markdown('\n')
+    if not sidebar:
+        for _ in range(x):
+            st.markdown('\n')
+    else:
+        for _ in range(x):
+            st.sidebar.markdown('\n')
 
 def sqlQueries(database,query,POST=False,arg=None,override=False):
     conn = sqlite3.connect(database)
