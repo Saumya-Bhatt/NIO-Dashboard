@@ -7,10 +7,12 @@ class StatusCodes():
         self.element = element
 
     error_codes = [
-        'Please give a name to the AUV bot instance!',
-        'Please give a reference ID to the AUV bot instance!', 
-        'Please enter an AUV reference ID to delete!',
-        'Reference ID of AUV Instance not specified!'  
+        'Please give a name to the AUV bot instance',
+        'Please give a reference ID to the AUV bot instance', 
+        'Please enter an AUV reference ID to delete',
+        'Reference ID of AUV Instance not specified',
+        'The entered AUV Reference ID Instance already exists',
+        'No such Instance with the given ID exists'  
     ]
 
     success_codes = [
@@ -21,15 +23,16 @@ class StatusCodes():
 
     warning_codes = [
         'All session tokens destroyed',
-        'Current session token was destroyed'  
+        'Current session token was destroyed',
+        '__NOTE__ : This will destroy all the generated and the current instances within the database. This will delete all the data related to those instances. Are you sure you want to proceed?'  
     ]
 
     info_codes = [
-        'No instance of the input reference ID is running',
         'There is no session currently in use',
+        'All global instances and sessions were deleted'
     ] 
 
-    def setCode(self,type,code):
+    def set_code(self,type,code):
         if type == 'error':
             return self.element.error(self.error_codes[code])
         elif type == 'success':

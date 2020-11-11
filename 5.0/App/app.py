@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from text import StatusCodes
-from frame import newline, sqlQueries, SessionManager
+from frame import newline, sql_queries, SessionManager, InstanceManager
 from streamlit_metrics import metric_row
 
 
@@ -11,71 +11,73 @@ st.subheader('Marine AUV Dashboard')
 
 status_code = StatusCodes(st.sidebar.empty())
 session = SessionManager('sessionManager.db')
+instance = InstanceManager('instanceManager.db')
+
 AUV_BOT_NAME = None
 AUV_BOT_ID = None
 
 def loginInstance():
 
     global AUV_BOT_NAME, AUV_BOT_ID
-
-    st.write("_Generate, set or delete any AUV instances from this panel. Dashboard's functionalities cannot be accessed if an instance is not set._")
+    st.write("_Generate, set, delete AUV instances from this panel. Dashboard's functionalities cannot be accessed if an instance is not set._")
 
     col1, col2, col3= st.beta_columns([3,3,1])
     temp_name = col1.text_input('Enter AUV bot name :',key='auvBotName')
     temp_id = col2.text_input('Enter AUV bot ID :',key='auvBotID')
-    submit = col3.button('Generate AUV Instance')
+    newline(1, element=col3)
+    submit = col3.button('Generate Instance')
 
     if submit:
         if temp_name == '':
-            status_code.setCode('error',0)
+            status_code.set_code('error',0)
         elif temp_id == '':
-            status_code.setCode('error',1)
+            status_code.set_code('error',1)
         else:
-            query = "INSERT INTO instance_log VALUES (?,?,?)"
-            sqlQueries(database='instanceManager.db', query=query, POST=True, arg=[None,temp_name,temp_id])
-            AUV_BOT_NAME = temp_name
-            AUV_BOT_ID = temp_id
-            status_code.setCode('success',0)
+            if instance.generate_instance(temp_name, temp_id):
+                status_code.set_code('success',0)
+            else:
+                status_code.set_code('error',4)
 
     col4, col5 = st.beta_columns([3,4])
-    delAUVInst = col4.text_input('Enter the AUV bot ID to remove instance :')
+    delAUVInst = col4.text_input('Enter the corresponding ID to remove instance :')
     submitDel = col4.button('Delete AUV Instance')
 
     if submitDel:
         if delAUVInst == '':
-            status_code.setCode('error',2)
+            status_code.set_code('error',2)
         else:
-            try:
-                query = "DELETE FROM instance_log WHERE auv_id=?"
-                sqlQueries(database='instanceManager.db', query=query, POST=True, arg=(delAUVInst,))
-                status_code.setCode('success',1)
-                if delAUVInst == AUV_BOT_ID:
-                    AUV_BOT_ID = ''
-                    AUV_BOT_NAME = ''
-                    delAUVInst = ''
-            except:
-                status_code.setCode('info',1)
+            if instance.delete_instance(delAUVInst):
+                status_code.set_code('success',1)
+            else:
+                status_code.set_code('error',5)
 
 
-    query = "SELECT * from instance_log"
-    records = sqlQueries(database='instanceManager.db', query=query)
-
-
-    df = pd.DataFrame(records, columns=['ID','AUV Name','AUV Ref. ID'])
+    df = pd.DataFrame(instance.get_all_instances(), columns=['ID','AUV Name','AUV Ref. ID'])
     col5.markdown('__All AUV instances running:__')
     col5.write(df)
     col5.button('Refresh table')
 
-    newline(1, element=col4)
-    col4.markdown('Set an AUV instance for this current session by specifying its reference ID :')
-    setInstance = col4.text_input('Enter AUV reference ID')
+    col4.markdown('Set current AUV Instance session :')
+    setInstance = col4.text_input('Enter AUV ID')
     confirmInstance = col4.button('Set AUV Instance')
     if confirmInstance:
         if setInstance == '':
-            status_code.setCode('error',3)
+            status_code.set_code('error',3)
         else:
-            session.createSession()
-            status_code.setCode('success',2)
+            session.create_session()
+            status_code.set_code('success',2)
+
+
+    newline(1)
+    destroyInstances = st.checkbox('⚠️ Destroy all Instances')
+    if destroyInstances:
+        status_code.set_code('warning',2)
+        confirmDelete = st.button('I understand the consequences. Confirm Delete')
+        if confirmDelete:
+            session.destroy_all_sessions()
+            instance.destroy_all_instances()
+            status_code.set_code('info',1)
+            
 
 
    
@@ -88,26 +90,26 @@ st.sidebar.header('Instance Monitor')
 st.sidebar.markdown('Name : &nbsp&nbsp&nbsp **'+str(AUV_BOT_NAME)+'**')
 st.sidebar.markdown('Reference ID : &nbsp&nbsp **'+str(AUV_BOT_ID)+'**')
 sessionStatus = st.sidebar.empty()
-if session.sessionStatus():
+if session.session_status():
     sessionStatus.markdown('Session Token Status : ✅ _RUNNING_')
 else:
     sessionStatus.markdown('Session Token status : 🟠 _NOT SET_')
 cachedSessions = st.sidebar.checkbox('Destroy cached sessions')
 if st.sidebar.button('Remove current session'):
-    if session.sessionStatus():
+    if session.session_status():
         if cachedSessions:
-            session.destroyAllSessions()
-            status_code.setCode('warning',0)
+            session.destroy_all_sessions()
+            status_code.set_code('warning',0)
             sessionStatus.markdown('Session Token Status : 🟥 DESTROYED')
         else:
-            session.deleteSession()
+            session.delete_session()
             sessionStatus.markdown('Session Token Status : 🟠 NOT SET')
-            status_code.setCode('warning',1)
+            status_code.set_code('warning',1)
     else:
-        status_code.setCode('info',1)
+        status_code.set_code('info',0)
 
 
-if session.sessionStatus():
+if session.session_status():
     newline(1, sidebar=True)
     battery = 72
     quote = "Battery Status : "+str(battery)+" %"
