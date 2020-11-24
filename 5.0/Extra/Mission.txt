@@ -1,0 +1,285 @@
+wpt Home
+	position: (15.4507,73.8041)
+	speed:0.5
+	depth: 1
+	timeout: 10000
+end
+
+lfw L1
+	position1: (15.4507,73.8041)
+	position2: (15.4509, 73.8041)
+	speed:0.5
+	depth: 2
+	timeout: 10000
+end
+
+lfw L2
+	position1: (15.4509,73.8041)
+	position2: (15.4509, 73.8043)
+	speed:0.5
+	depth: 1
+	timeout: 10000
+end
+
+END
+
+lfw L3
+	position1: (15.4519,73.8043)
+	position2: (15.4507, 73.8043)
+	speed: 0.5
+	timeout: 10000
+end
+
+lfw_FA L4
+	position1: (15.4507,73.8043)
+	position2: (15.4507, 73.8045)
+	speed:0.5
+	heading: 50
+	timeout: 10000
+end
+
+constHeading CH1
+	vars:
+		heading: 100
+	end
+	lfw_FA L5
+		position1: (15.4507,73.8045)
+		position2: (15.4509, 73.8045)
+		speed:0.5
+		heading: 30
+		timeout: 10000
+	end
+
+	L4
+end
+
+
+END
+
+loiter LT1
+	vars:
+		timeout: 10000
+	end
+
+	wpt WPT1
+		position: (15.4509,73.8041)
+		speed: 0.5
+		heading: 0
+		captureRadius:0
+		slipRadius:0 
+		timeout: 10
+	end
+	
+	wpt WPTL2
+		position: (15.4509,73.8043)
+		speed:0.5
+		heading: 0
+		captureRadius:0
+		slipRadius:0 
+		timeout: 10
+	end
+
+	wpt WPTL3
+			position:(15.4508,73.8043)
+			speed:0.5
+			heading: 0
+			captureRadius:0
+			slipRadius:0
+			timeout: 10
+	end
+
+	wpt WPTL4
+			position:(15.4508,73.8041)
+			speed:0.5
+			heading: 0
+			captureRadius:0
+			slipRadius:0
+			timeout: 10
+	end
+end
+
+Home
+
+END
+
+wpt WPT3
+	position: (0,5)
+	speed:1
+	heading: 0
+	captureRadius:0
+	slipRadius:0 
+	timeout: 20
+end
+
+wpt WPT4
+	position: (0,0)
+	speed:1
+	heading: 0
+	captureRadius:0
+	slipRadius:0 
+	timeout: 20
+end
+
+
+lfw LFW11l
+	point1: (1,2)
+	point2: (5,2)
+	speed:1l
+	heading: 1l
+	maxError: 1l
+	timeout:1l
+end
+
+arc ARC1
+	centerCoord: 1a
+	radius:1a
+	heading: a1
+	errMargin: 1a
+	direction: clockwise/anticlockwise
+	start: nearest/{position}
+	timeout: 
+end
+
+dock DOCK1
+	position: out
+	heading: out
+end
+
+constDepth CD1
+	vars:
+		depth: over
+	end
+	dock DOCK1
+		position: 1
+		heading: 2
+	end
+
+	constHeading HD1
+		vars:
+			heading: 100
+		end
+
+		DOCK1
+
+		constHeading HD2
+		vars:
+			heading: 200
+		end		
+			arc ARC2
+				centerCoord: 1a
+				radius:1a
+				heading: a1
+				errMargin: 1a
+				direction: clockwise/anticlockwise
+				start: nearest/{position}
+				timeout: sac
+			end
+		end
+	end
+end
+
+constPitch CP1
+	vars
+		pitch: pit
+	end
+
+	ARC1
+end
+
+
+
+constHeading
+	vars
+		heading: 
+	end
+
+	wpt
+	end
+	
+	lfw
+	end
+	... 
+end
+
+constPitch
+	vars
+		pitch:
+	end
+
+	wpt
+	end
+	
+	lfw
+	end
+	... 
+end
+
+constSpeed
+	vars
+		speed:
+	end
+
+	wpt
+	end
+
+	lft
+	end
+	...
+	timeout:	
+end
+
+loiter
+	wpt:
+	end
+	
+	wpt:
+	end
+	
+	lfw:
+	end
+
+	stkp:
+	end
+	....
+	timeout: 
+end
+
+surfacing
+	wpt
+	end
+
+	lfw
+	end
+	...
+	timeout: 
+end
+
+loiter
+		
+	constDept
+		vars
+			depth: 
+		end
+		constHeading
+			vars
+				heading:
+			end
+			
+			wpt
+			end
+
+			wpt
+			end
+			
+			lfw
+			end
+
+			...
+			timeout:
+		end
+		timeout:
+	end
+	timeout: 
+end
+
+END

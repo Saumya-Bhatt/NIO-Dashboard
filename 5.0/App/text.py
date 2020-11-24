@@ -12,13 +12,16 @@ class StatusCodes():
         'Please enter an AUV reference ID to delete',
         'Reference ID of AUV Instance not specified',
         'The entered AUV Reference ID Instance already exists',
-        'No such Instance with the given ID exists'  
+        'No such Instance with the given ID exists',
+        'Please load a mission file!',
+        'There was an error compiling the file. Please check the logs'  
     ]
 
     success_codes = [
         'AUV bot instance created!',
         'The given AUV instance was deleted!',
-        'Session instance running!'
+        'Session instance running!',
+        'File compiled successufully'
     ]
 
     warning_codes = [

@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 
 from text import StatusCodes
-from frame import newline, sql_queries, SessionManager, InstanceManager
+from models import SessionManager, InstanceManager
+from frame import newline, compile_missionFile
 from streamlit_metrics import metric_row
 
 
@@ -127,12 +128,34 @@ if session.session_status():
     st.sidebar.header('Navigation')
     functionality = st.sidebar.selectbox('Select functionality to open console',
                     ('None','Real-time Mapping','Mission File Upload','Onboard Camera Feed'))
+
+
     if functionality == 'Real-time Mapping':
         st.header('Real-time Mapping')
+
+
+
     elif functionality == 'Mission File Upload':
+
         st.header('Mission File Upload')
+        mission_file = st.file_uploader('Upload Mission file to server')
+        compile = st.button('Compile')
+        if compile:
+            if mission_file is not None:
+                try:
+                    compile_missionFile(mission_file)
+                    status_code.set_code('success',3)
+                except:
+                    status_code.set_code('error',7)
+            else:
+                status_code.set_code('error',6)
+
+
     elif functionality == 'Onboard Camera Feed':
         st.header('Onboard Camera Feed')
+
+
+
     else:
         pass
 
