@@ -1,3 +1,12 @@
+########################################################
+
+# AUV Dashboard GUI made for NIO
+# Author: Saumya Bhatt, BITS Goa
+
+###################################################
+
+
+
 import streamlit as st
 import pandas as pd
 
@@ -125,14 +134,16 @@ with instance_expander:
 #================================================================================== 
    
 
-#==================================================================================
-#==============================  INSTANCE MANAGER  ================================
-#==================================================================================
-
 st.sidebar.header('Instance Monitor')
 st.sidebar.markdown('Name : &nbsp&nbsp&nbsp **'+str(AUV_BOT_NAME)+'**')
 st.sidebar.markdown('AUV Key : &nbsp&nbsp **'+str(AUV_BOT_ID)+'**')
 sessionStatus = st.sidebar.empty()
+
+
+#==================================================================================
+#==============================  INSTANCE MANAGER  ================================
+#==================================================================================
+
 
 if session.session_status():
     sessionStatus.markdown('Session Token Status : ✅ _RUNNING_')
