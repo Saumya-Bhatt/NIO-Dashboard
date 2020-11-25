@@ -7,13 +7,13 @@
 
 
 
-from os import remove
 import streamlit as st
 import pandas as pd
 
-from text import StatusCodes
-from models import SessionManager, InstanceManager, MissionUpload
-from frame import newline, global_sessions
+from modules import models
+from modules.text import StatusCodes
+from modules.frame import newline, global_sessions
+
 from streamlit_metrics import metric_row
 
 
@@ -31,12 +31,12 @@ st.title('CSIR - National Institute of Oceanography')
 st.subheader('Marine AUV Dashboard')
 
 status_code = StatusCodes(st.sidebar.empty())
-session = SessionManager('SessionManager.db')
-instance = InstanceManager('127.0.0.1','nio_server')
+session = models.SessionManager('SessionManager.db')
+instance = models.InstanceManager('127.0.0.1','nio_server')
 
 REFERENCE_ID, AUV_BOT_NAME, AUV_BOT_ID = global_sessions(session, instance)
 
-mission = MissionUpload(REFERENCE_ID, instance)
+mission = models.MissionUpload(REFERENCE_ID, instance)
 
 
 

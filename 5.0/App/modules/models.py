@@ -1,9 +1,9 @@
-from frame import sql_query
-from MissionCompiler import readMission
+from modules.frame import sql_query
+from functions.MissionCompiler import readMission
+
 import datetime
 import json
 import os
-
 
 
 

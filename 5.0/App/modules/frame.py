@@ -1,12 +1,7 @@
-from sqlite3.dbapi2 import connect
 import streamlit as st
 import mysql.connector
 import sqlite3
-import json
-import os
 
-from MissionCompiler import readMission
- 
 
 
 def newline(x, sidebar=False, element=None):
