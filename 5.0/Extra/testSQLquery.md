@@ -4,17 +4,17 @@
 
 ## Selecting the Instance to the given Instance Key
 
-    SELECT id FROM auvinstance WHERE AUV_Key = 'TestKey'
+    SELECT id FROM auvinstances WHERE AUV_Key = 'TestKey'
 
 <br>
 
 ## Getting the value from the table
 
-    SELECT Latitude, Longitude
-    FROM coordinates
-    INNER JOIN auvinstance ON auvinstance.ID = coordinates.Instance_Cordi_ID
-    WHERE auvinstance.AUV_Key = 'TestKey'
-    ORDER BY coordinates.ID DESC LIMIT 1
+    SELECT Uploaded_File, Time_Stamp
+    FROM missionfile
+    INNER JOIN auvinstances ON auvinstances.ID = missionfile.Instance_missionFile_ID
+    WHERE auvinstances.AUV_Key = '123'
+    ORDER BY missionfile.ID DESC
 
 <br>
 
@@ -34,17 +34,17 @@ Now store the value pertaining to that ID
 
 First get ID that instance in the table. Will give the latest stored data to that instance
 
-    SELECT coordinates.ID
-    FROM coordinates
-    INNER JOIN auvinstance ON auvinstance.ID = coordinates.Instance_Cordi_ID
-    WHERE auvinstance.AUV_Key = 'TestKey'
-    ORDER BY coordinates.ID DESC LIMIT 1
+    SELECT missionfile.ID
+    FROM missionfile
+    INNER JOIN auvinstances ON auvinstances.ID = missionfile.Instance_missionFile_ID
+    WHERE auvinstances.AUV_Key = '123'
+    ORDER BY missionfile.ID DESC LIMIT 1
 
 Now update that value:
 
-    UPDATE coordinates
-    SET Latitude = '77.77', Longitude = '44.44'
-    WHERE ID = 6;
+    UPDATE missionfile
+    SET Uploaded_File = 'Updated_file', Time_Stamp = '44:44'
+    WHERE ID = 1;
 
 <br>
 
@@ -52,6 +52,7 @@ Now update that value:
 
     INSERT INTO auvinstance (ID, AUV_Name, AUV_Key) VALUES (Null, 'FinalName','Admin123')
 
-Deleting an instance will delete all values related to it. To delete an instance:
+## Deleting an instance
+Deleting an instance will delete all values related to it.
 
-    DELETE FROM auvinstance WHERE AUV_Key = 'admin123'
+    DELETE FROM auvinstances WHERE AUV_Key = '987'
