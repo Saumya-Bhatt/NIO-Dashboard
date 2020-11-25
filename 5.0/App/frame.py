@@ -1,4 +1,6 @@
+from sqlite3.dbapi2 import connect
 import streamlit as st
+import mysql.connector
 import sqlite3
 import os
 
@@ -16,28 +18,38 @@ def newline(x, sidebar=False, element=None):
     else:
         for _ in range(x):
             st.sidebar.markdown('\n')
+    return None
 
-def sql_queries(database,query,POST=False,arg=None,override=False):
-    conn = sqlite3.connect(database)
-    curr = conn.cursor()
 
-    if override:
-        curr.execute(query)
-        conn.commit()
-        conn.close()
-        return None
 
-    if POST == False:
-        curr.execute(query)
-        records = curr.fetchall()
-        curr.close()
-        conn.close()
-        return records
+def sql_query(database,query, address=None,sqlite=False,arg=None,returnVal=False):
+    if sqlite:
+        connection = sqlite3.connect(database)
     else:
-        curr.execute(query,arg)
-        conn.commit()
-        conn.close()
+        connection = mysql.connector.connect(
+            user = 'root',
+            password = '',
+            host = address,
+            database = database
+        )
+    cursor = connection.cursor()
+    if returnVal == False:
+        if arg is None:
+            cursor.execute(query)
+        else:
+            cursor.execute(query,arg)
+        connection.commit()
+        cursor.close()
+        connection.close()
         return None
+    else:
+        if arg is None:
+            cursor.execute(query)
+            records = cursor.fetchall()
+        else:
+            records = cursor.execute(query,arg)
+        connection.close()
+        return records
 
 
 def compile_missionFile(file):
@@ -46,3 +58,15 @@ def compile_missionFile(file):
         f.write(data.decode('utf-8'))
     readMission(filename='Mission.txt')
     os.remove('Mission.txt')
+    return None
+
+
+def global_sessions(session, instance):
+    if session.session_status():
+        try:
+            instID = session.get_last_row()[0][1]
+            val = instance.get_instance(instID)
+            return [val[0][1], val[0][2]]
+        except:
+            return [None, None]      
+    return [None, None]
