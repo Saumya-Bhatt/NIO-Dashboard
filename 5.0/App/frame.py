@@ -2,6 +2,7 @@ from sqlite3.dbapi2 import connect
 import streamlit as st
 import mysql.connector
 import sqlite3
+import json
 import os
 
 from MissionCompiler import readMission
@@ -52,21 +53,13 @@ def sql_query(database,query, address=None,sqlite=False,arg=None,returnVal=False
         return records
 
 
-def compile_missionFile(file):
-    data = file.read()
-    with open('Mission.txt','w+') as f:
-        f.write(data.decode('utf-8'))
-    readMission(filename='Mission.txt')
-    os.remove('Mission.txt')
-    return None
-
 
 def global_sessions(session, instance):
     if session.session_status():
         try:
             instID = session.get_last_row()[0][1]
             val = instance.get_instance(instID)
-            return [val[0][1], val[0][2]]
+            return [val[0][0], val[0][1], val[0][2]]
         except:
-            return [None, None]      
-    return [None, None]
+            return [None, None, None]      
+    return [None, None, None]

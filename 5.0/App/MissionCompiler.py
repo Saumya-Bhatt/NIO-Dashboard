@@ -240,9 +240,9 @@ def main():
 
 	# Dump the mission dictionary as JSON file for the purpose of testing
 	# This can be removed for final implementation
-	with open('result.json', 'w') as fp:
-		json.dump(Mission,fp,indent=4)
-		fp.close()
+	# with open('result.json', 'w') as fp:
+	# 	json.dump(Mission,fp,indent=4)
+	# 	fp.close()
 
 	return Mission
 

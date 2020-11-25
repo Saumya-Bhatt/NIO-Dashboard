@@ -1,4 +1,10 @@
 from frame import sql_query
+from MissionCompiler import readMission
+import datetime
+import json
+import os
+
+
 
 
 class SessionManager():
@@ -40,6 +46,8 @@ class SessionManager():
         sql_query(database=self.database, query=query, sqlite=True)
         return None
 
+
+
     
 class InstanceManager():
 
@@ -80,7 +88,7 @@ class InstanceManager():
         return sql_query(address=self.address, database=self.database, query=query, returnVal=True)
 
     def get_all_instances(self):
-        query = "SELECT * from auvinstances"
+        query = "SELECT * FROM auvinstances"
         return sql_query(address=self.address, database=self.database, query=query, returnVal=True)
 
 
@@ -88,3 +96,35 @@ class InstanceManager():
         query = 'DELETE FROM auvinstances'
         sql_query(address=self.address, database=self.database, query=query)
         return None
+
+
+
+
+class MissionUpload():
+
+    def __init__(self, sessionID, instance):
+        self.sessionID = sessionID
+        self.database = instance.database
+        self.address = instance.address
+
+    def get_missions(self):
+        query = 'SELECT * FROM missionfile WHERE Instance_missionFile_ID=' + str(self.sessionID)
+        return sql_query(address=self.address, database=self.database, query=query, returnVal=True)
+
+    def compile(self,file):
+        data = file.read()
+        with open('Mission.txt','w+') as f:
+            f.write(data.decode('utf-8'))
+        compiledMission = json.dumps(readMission(filename='Mission.txt'))
+        os.remove('Mission.txt')
+        return compiledMission
+
+    def upload(self,file):
+        query = 'INSERT INTO missionfile VALUES (%s, %s, %s, %s, %s)'
+        args = [None, file, str(datetime.datetime.now()), 'UPLOADED', self.sessionID]
+        sql_query(address=self.address, database=self.database, query=query, arg=args)
+
+    def remove(self, missionID):
+        query = 'DELETE FROM missionfile WHERE Instance_missionFile_ID = %s AND ID = %s'
+        arg = [self.sessionID, missionID]
+        sql_query(address=self.address, database=self.database, query=query, arg=arg)

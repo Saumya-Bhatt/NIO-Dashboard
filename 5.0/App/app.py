@@ -1,18 +1,19 @@
 ########################################################
 
-# AUV Dashboard GUI made for NIO
+# AUV Dashboard GUI made for CSIR-NIO
 # Author: Saumya Bhatt, BITS Goa
 
 ###################################################
 
 
 
+from os import remove
 import streamlit as st
 import pandas as pd
 
 from text import StatusCodes
-from models import SessionManager, InstanceManager
-from frame import newline, compile_missionFile, global_sessions
+from models import SessionManager, InstanceManager, MissionUpload
+from frame import newline, global_sessions
 from streamlit_metrics import metric_row
 
 
@@ -33,9 +34,9 @@ status_code = StatusCodes(st.sidebar.empty())
 session = SessionManager('SessionManager.db')
 instance = InstanceManager('127.0.0.1','nio_server')
 
-AUV_BOT_NAME, AUV_BOT_ID = global_sessions(session, instance)
+REFERENCE_ID, AUV_BOT_NAME, AUV_BOT_ID = global_sessions(session, instance)
 
-
+mission = MissionUpload(REFERENCE_ID, instance)
 
 
 
@@ -204,18 +205,28 @@ if session.session_status():
     #======================= FILE UPLOAD ===========================================
     elif functionality == 'Mission File Upload':
 
+
         st.header('Mission File Upload')
+        currentTable = st.empty()
+        df_mission = pd.DataFrame(mission.get_missions(), columns=['ID','Mission','Timestamp','Status','Inst'])
+        currentTable.table(df_mission)
+
         mission_file = st.file_uploader('Upload Mission file to server')
-        compile = st.button('Compile')
-        if compile:
+        if st.button('Upload mission file'):
             if mission_file is not None:
-                try:
-                    compile_missionFile(mission_file)
-                    status_code.set_code('success',3)
-                except:
-                    status_code.set_code('error',7)
+                MISSION_FILE = mission.compile(mission_file)
+                mission.upload(MISSION_FILE)
+                status_code.set_code('success',3)
+                currentTable.table(mission.get_missions())
             else:
                 status_code.set_code('error',6)
+        remove_file = st.text_input('Enter Mission File ID to remove from server')
+        if st.button('Remove selected mission file'):
+            mission.remove(remove_file)
+            currentTable.table(mission.get_missions())
+            status_code.set_code('warning',3)
+
+
 
     #========================= CAMERA =============================================
     elif functionality == 'Onboard Camera Feed':

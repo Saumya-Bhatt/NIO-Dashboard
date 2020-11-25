@@ -14,20 +14,20 @@ class StatusCodes():
         'The entered AUV Reference ID Instance already exists',
         'No such Instance with the given ID exists',
         'Please load a mission file!',
-        'There was an error compiling the file. Please check the logs'  
     ]
 
     success_codes = [
         'AUV bot instance created!',
         'The given AUV instance was deleted!',
         'Session instance running!',
-        'File compiled successufully'
+        'File compiled and uploaded successufully'
     ]
 
     warning_codes = [
         'All session tokens destroyed',
         'Current session token was destroyed',
-        '__NOTE__ : This will destroy all the generated and the current instances within the database. This will delete all the data related to those instances. Are you sure you want to proceed?'  
+        '__NOTE__ : This will destroy all the generated and the current instances within the database. This will delete all the data related to those instances. Are you sure you want to proceed?',
+        'The file was removed from the server'  
     ]
 
     info_codes = [
