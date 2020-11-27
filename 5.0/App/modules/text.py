@@ -14,7 +14,8 @@ class StatusCodes():
         'The entered AUV Reference ID Instance already exists',
         'No such Instance with the given ID exists',
         'Please load a mission file!',
-        'The entered Mission File ID does not exist. Please enter a valid ID'
+        'The entered Mission File ID does not exist. Please enter a valid ID',
+        'Please check the network URL is correct or that you have followed the steps properly.'
     ]
 
     success_codes = [
@@ -22,7 +23,8 @@ class StatusCodes():
         'The given AUV instance was deleted!',
         'Session instance running!',
         'File compiled and uploaded successufully',
-        'Specified Mission File is Running'
+        'Specified Mission File is Running',
+        'Live video stream is running on new window'
     ]
 
     warning_codes = [
@@ -54,3 +56,10 @@ class MethodIntro():
 
     def MissionFileUpload(self):
         st.markdown('Upload your mission files to the server via this panel and moniter their status. Given below is a list of all the mission files currently available on server.')
+
+    def OnboardCamera(self):
+        st.markdown('''
+        This feature uses a 3rd-party application to run. Follow the steps given below : \n
+        1. Ensure that the GUI and the AUV are on same network.
+        2. Open application 'IP Webcam' and enter the IPv4 network URL into below field.
+        ''')

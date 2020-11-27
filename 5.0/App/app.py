@@ -14,6 +14,8 @@ from modules import models
 from modules.text import StatusCodes, MethodIntro
 from modules.frame import newline, global_sessions, df_mission_file
 
+from functions.Camera import streamVideo
+
 from streamlit_metrics import metric_row
 
 
@@ -93,7 +95,6 @@ def loginInstance():
     number_instances = len(instance.get_all_instances())
     col5.markdown('__All AUV instances running:__ &nbsp&nbsp' + str(number_instances))
     col5.write(df)
-    col5.button('Refresh table')
 
 
     #================================== SET INSTANCE SESSION ================================
@@ -261,13 +262,18 @@ if session.session_status():
 
     #========================= CAMERA =============================================
     elif functionality == 'Onboard Camera Feed':
-        st.header('Onboard Camera Feed')
 
+        st.header('Onboard Camera Feed')
+        method.OnboardCamera()
+
+        URL = st.text_input('Enter Network URL below [eg.  192.168.43.121:8080] :')
+        if st.button('Generate live feed stream'):
+            try:
+                streamVideo(URL)
+                status_code.set_code('success',5)
+            except:
+                method.MissionFileUpload()
 
 
     else:
         pass
-
-
-    st.sidebar.markdown('_Press if dashboard overloads_')
-    st.sidebar.button('Kill all processes')
