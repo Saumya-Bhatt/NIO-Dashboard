@@ -106,10 +106,25 @@ class MissionUpload():
         self.sessionID = sessionID
         self.database = instance.database
         self.address = instance.address
+        self.missionID = None
 
     def get_missions(self):
         query = 'SELECT * FROM missionfile WHERE Instance_missionFile_ID=' + str(self.sessionID)
         return sql_query(address=self.address, database=self.database, query=query, returnVal=True)
+
+
+    def get_status(self,status=None):
+        if status is None:
+            return '_None_'
+        elif status == 'run':
+            return '▶️ _RUNNING_'
+        elif status == 'abort':
+            return '🆎 _ABORTED_'
+        elif status == 'upload':
+            return '🌐 _UPLOADED_'
+        elif status == 'remove':
+            return '🔴 _REMOVED_'
+
 
     def compile(self,file):
         data = file.read()
@@ -119,12 +134,44 @@ class MissionUpload():
         os.remove('Mission.txt')
         return compiledMission
 
+    def mission_present(self,ID):
+        try:
+            query = 'SELECT * FROM missionFile WHERE Instance_missionFile_ID = %s AND ID = %s'
+            args = [self.missionID, ID]
+            rows = sql_query(address=self.address, database=self.database, query=query, arg=args, returnVal=True)
+            return True
+        except:
+            return False
+
+
     def upload(self,file):
         query = 'INSERT INTO missionfile VALUES (%s, %s, %s, %s, %s)'
         args = [None, file, str(datetime.datetime.now()), 'UPLOADED', self.sessionID]
         sql_query(address=self.address, database=self.database, query=query, arg=args)
 
+
+    def abort(self, missionID):
+        if self.mission_present(missionID):
+            query = 'UPDATE missionfile SET Mission_Status = %s WHERE Instance_missionFile_ID = %s AND ID = %s'
+            arg = ['ABORTED', self.sessionID, missionID]
+            sql_query(address=self.address, database=self.database, query=query, arg=arg)
+            return True
+        return False
+
+
+    def run(self, missionID):
+        if self.mission_present(missionID):
+            query = 'UPDATE missionfile SET Mission_Status = %s WHERE Instance_missionFile_ID = %s AND ID = %s'
+            arg = ['RUNNING', self.sessionID, missionID]
+            sql_query(address=self.address, database=self.database, query=query, arg=arg)
+            return True
+        return False
+
+
     def remove(self, missionID):
-        query = 'DELETE FROM missionfile WHERE Instance_missionFile_ID = %s AND ID = %s'
-        arg = [self.sessionID, missionID]
-        sql_query(address=self.address, database=self.database, query=query, arg=arg)
+        if self.mission_present(missionID):
+            query = 'DELETE FROM missionfile WHERE Instance_missionFile_ID = %s AND ID = %s'
+            arg = [self.sessionID, missionID]
+            sql_query(address=self.address, database=self.database, query=query, arg=arg)
+            return True
+        return False

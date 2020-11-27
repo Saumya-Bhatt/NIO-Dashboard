@@ -14,20 +14,23 @@ class StatusCodes():
         'The entered AUV Reference ID Instance already exists',
         'No such Instance with the given ID exists',
         'Please load a mission file!',
+        'The entered Mission File ID does not exist. Please enter a valid ID'
     ]
 
     success_codes = [
         'AUV bot instance created!',
         'The given AUV instance was deleted!',
         'Session instance running!',
-        'File compiled and uploaded successufully'
+        'File compiled and uploaded successufully',
+        'Specified Mission File is Running'
     ]
 
     warning_codes = [
         'All session tokens destroyed',
         'Current session token was destroyed',
         '__NOTE__ : This will destroy all the generated and the current instances within the database. This will delete all the data related to those instances. Are you sure you want to proceed?',
-        'The file was removed from the server'  
+        'The file was removed from the server',
+        'Specified Mission File was aborted'  
     ]
 
     info_codes = [
@@ -44,3 +47,10 @@ class StatusCodes():
             return self.element.warning(self.warning_codes[code])
         else:
             return self.element.info(self.info_codes[code])  
+
+
+
+class MethodIntro():
+
+    def MissionFileUpload(self):
+        st.markdown('Upload your mission files to the server via this panel and moniter their status. Given below is a list of all the mission files currently available on server.')

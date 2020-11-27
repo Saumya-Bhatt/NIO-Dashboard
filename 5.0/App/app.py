@@ -11,8 +11,8 @@ import streamlit as st
 import pandas as pd
 
 from modules import models
-from modules.text import StatusCodes
-from modules.frame import newline, global_sessions
+from modules.text import StatusCodes, MethodIntro
+from modules.frame import newline, global_sessions, df_mission_file
 
 from streamlit_metrics import metric_row
 
@@ -31,6 +31,7 @@ st.title('CSIR - National Institute of Oceanography')
 st.subheader('Marine AUV Dashboard')
 
 status_code = StatusCodes(st.sidebar.empty())
+method = MethodIntro()
 session = models.SessionManager('SessionManager.db')
 instance = models.InstanceManager('127.0.0.1','nio_server')
 
@@ -89,7 +90,8 @@ def loginInstance():
 
     #================================ ALL INSTANCES RUNNING ================================
     df = pd.DataFrame(instance.get_all_instances(), columns=['ID','AUV Name','AUV Key'])
-    col5.markdown('__All AUV instances running:__')
+    number_instances = len(instance.get_all_instances())
+    col5.markdown('__All AUV instances running:__ &nbsp&nbsp' + str(number_instances))
     col5.write(df)
     col5.button('Refresh table')
 
@@ -138,6 +140,7 @@ with instance_expander:
 st.sidebar.header('Instance Monitor')
 st.sidebar.markdown('Name : &nbsp&nbsp&nbsp **'+str(AUV_BOT_NAME)+'**')
 st.sidebar.markdown('AUV Key : &nbsp&nbsp **'+str(AUV_BOT_ID)+'**')
+st.sidebar.markdown('ID tracking : &nbsp&nbsp **' + str(REFERENCE_ID) + '**')
 sessionStatus = st.sidebar.empty()
 
 
@@ -207,24 +210,52 @@ if session.session_status():
 
 
         st.header('Mission File Upload')
+        method.MissionFileUpload()
         currentTable = st.empty()
-        df_mission = pd.DataFrame(mission.get_missions(), columns=['ID','Mission','Timestamp','Status','Inst'])
-        currentTable.table(df_mission)
+        col1, col2 = st.beta_columns([2,1])
+        file_status = col1.empty()
 
-        mission_file = st.file_uploader('Upload Mission file to server')
-        if st.button('Upload mission file'):
+        currentTable.table(df_mission_file(mission))
+        file_status.markdown('Current Mission File Status : &nbsp&nbsp' + mission.get_status())
+
+
+        mission_file = col1.file_uploader('Upload Mission file to server')
+        if col1.button('Upload mission file'):
             if mission_file is not None:
                 MISSION_FILE = mission.compile(mission_file)
                 mission.upload(MISSION_FILE)
                 status_code.set_code('success',3)
-                currentTable.table(mission.get_missions())
+                currentTable.table(df_mission_file(mission))
+                file_status.markdown('Current Mission File Status : &nbsp&nbsp' + mission.get_status('upload'))
             else:
                 status_code.set_code('error',6)
-        remove_file = st.text_input('Enter Mission File ID to remove from server')
-        if st.button('Remove selected mission file'):
-            mission.remove(remove_file)
-            currentTable.table(mission.get_missions())
-            status_code.set_code('warning',3)
+
+
+        mission_ID_Tracking = col2.text_input('Set Mission File ID to perform below mentioned operations')
+
+        if col2.button('Remove set mission file'):
+            if mission.remove(mission_ID_Tracking):
+                currentTable.table(df_mission_file(mission))
+                file_status.markdown('Current Mission File Status : &nbsp&nbsp' + mission.get_status('remove'))
+                status_code.set_code('warning',3)
+            else:
+                status_code.set_code('error',7)
+
+        if col2.button('Abort set mission file'):
+            if mission.abort(mission_ID_Tracking):
+                currentTable.table(df_mission_file(mission))
+                file_status.markdown('Current Mission File Status : &nbsp&nbsp' + mission.get_status('abort'))
+                status_code.set_code('warning',4)
+            else:
+                status_code.set_code('error',7)
+
+        if col2.button('Run set mission file'):
+            if mission.run(mission_ID_Tracking):
+                currentTable.table(df_mission_file(mission))
+                file_status.markdown('Current Mission File Status : &nbsp&nbsp' + mission.get_status('run'))
+                status_code.set_code('success',4)
+            else:
+                status_code.set_code('error',7)
 
 
 

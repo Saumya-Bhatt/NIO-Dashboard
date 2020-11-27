@@ -2,6 +2,7 @@ import streamlit as st
 import mysql.connector
 import sqlite3
 
+import pandas as pd
 
 
 def newline(x, sidebar=False, element=None):
@@ -58,3 +59,7 @@ def global_sessions(session, instance):
         except:
             return [None, None, None]      
     return [None, None, None]
+
+
+def df_mission_file(mission):
+    return pd.DataFrame(mission.get_missions(), columns=['ID','Mission','Timestamp','Status','Inst'])
