@@ -1,0 +1,24 @@
+[
+{"type":"header","version":"5.0.2","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"nio_server"},
+{"type":"table","name":"auvinstances","database":"nio_server","data":
+[
+
+]
+}
+,{"type":"table","name":"auvstatus","database":"nio_server","data":
+[
+
+]
+}
+,{"type":"table","name":"coordinates","database":"nio_server","data":
+[
+
+]
+}
+,{"type":"table","name":"missionfile","database":"nio_server","data":
+[
+
+]
+}
+]
