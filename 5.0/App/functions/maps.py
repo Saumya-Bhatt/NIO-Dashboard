@@ -1,14 +1,6 @@
 import pandas as pd
 import pydeck as pdk
-import urllib
 
-def internet_on():
-    for timeout in [1,5,10,15]:
-        try:
-            urllib.urlopen('http://google.com',timeout=timeout)
-            return True
-        except urllib.URLError as err: pass
-    return False
 
 def onlineMap(COORDINATES):
     

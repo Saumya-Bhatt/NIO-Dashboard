@@ -16,7 +16,7 @@ from modules import models
 from modules.text import StatusCodes, MethodIntro
 from modules.frame import newline, global_sessions, df_mission_file
 from functions.Camera import streamVideo
-from functions.maps import onlineMap, internet_on
+from functions.maps import onlineMap
 
 
 
@@ -219,32 +219,29 @@ if session.session_status():
         col1_map, col2_map = st.beta_columns([1,1])
         if col1_map.checkbox('Online Mapping'):
 
+            st.markdown('__NOTE :__ Switching from the mapping to another functionality without properly exiting it may cause the GUI to become unresponsive. Try clicking kill processes. If issue persists, restart the dashboard from the command prompt.')
             online_map = st.empty()
             online_locations = st.empty()
 
-            if internet_on:
-                if 'NaN' in DB_VALUES.get_coordinates():
-                    status_code.set_code('error', 9)
-                else:
-
-                    def schedule_online():
-                        data = DB_VALUES.get_coordinates()
-                        COORDINATES = {
-                        'HOME' : [float(data[1]),float(data[2]),'🟢'],
-                        'BOAT' : [float(data[3]),float(data[4]),'🔵'],
-                        'C-BOT' : [float(data[5]),float(data[6]),'🔴']
-                        }
-                        st.markdown('__NOTE :__ Switching from the mapping to another functionality without properly exiting it may cause the GUI to become unresponsive. Try clicking kill processes. If issue persists, restart the dashboard from the command prompt.')
-                        online_locations.table( pd.DataFrame(COORDINATES, index=['Longitude','Latitude','Marker']))
-                        online_map.pydeck_chart(onlineMap(COORDINATES))
-                        return None
-
-                    schedule.every(2).seconds.do(schedule_online).tag('schedule_online')
-                    while True:
-                        schedule.run_pending()
-                        time.sleep(1)
+            if 'NaN' in DB_VALUES.get_coordinates():
+                status_code.set_code('error', 9)
             else:
-                st.info('No internet connection detected. Please try using the offline map.')
+                def schedule_online():
+                    data = DB_VALUES.get_coordinates()
+                    COORDINATES = {
+                    'HOME' : [float(data[1]),float(data[2]),'🟢'],
+                    'BOAT' : [float(data[3]),float(data[4]),'🔵'],
+                    'C-BOT' : [float(data[5]),float(data[6]),'🔴']
+                    }
+                    online_locations.table( pd.DataFrame(COORDINATES, index=['Longitude','Latitude','Marker']))
+                    online_map.pydeck_chart(onlineMap(COORDINATES))
+                    return None
+
+                schedule.every(2).seconds.do(schedule_online).tag('schedule_online')
+                while True:
+                    schedule.run_pending()
+                    time.sleep(1)
+
 
 
         if col2_map.checkbox('Offline Mapping'):
