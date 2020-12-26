@@ -15,7 +15,8 @@ class StatusCodes():
         'No such Instance with the given ID exists',
         'Please load a mission file!',
         'The entered Mission File ID does not exist. Please enter a valid ID',
-        'Please check the network URL is correct or that you have followed the steps properly.'
+        'Please check the network URL is correct or that you have followed the steps properly.',
+        'Received NaN for coordinates. Check database entry.'
     ]
 
     success_codes = [
@@ -64,9 +65,13 @@ class MethodIntro():
         2. Open application 'IP Webcam' and enter the IPv4 network URL into below field.
         ''')
 
+    def realtime_mapping(self):
+        st.markdown('Real-time updated mapping functionality with offline and online accessability. Coordinates given in lat-long in the table.')
+
+
     def killProcess(self):
         st.markdown('''
-        All functions connecting to the server side has been paused. If the dashboard is malfunctioning, press `ctrl + shft + r` to restart the browser. If any problems still persist, try shutting down the serve and start again.
+        All functions connecting to the server side has been paused. If the dashboard is malfunctioning, press `ctrl + shft + r` to restart the browser. If any problems still persist, try shutting down the serve and start again from the command prompt.
         \n
         1. Functionalities which involve connecting to the server side has been paused.
         2. You can open the consoles but the data displaying there will not be dynamically updated. 

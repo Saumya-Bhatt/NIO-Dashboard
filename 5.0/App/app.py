@@ -7,6 +7,7 @@
 
 
 import schedule
+import logging
 import time
 import streamlit as st
 import pandas as pd
@@ -15,6 +16,7 @@ from modules import models
 from modules.text import StatusCodes, MethodIntro
 from modules.frame import newline, global_sessions, df_mission_file
 from functions.Camera import streamVideo
+from functions.maps import onlineMap, internet_on
 
 
 
@@ -39,7 +41,7 @@ instance = models.InstanceManager('127.0.0.1','nio_server')
 REFERENCE_ID, AUV_BOT_NAME, AUV_BOT_ID = global_sessions(session, instance)
 
 mission = models.MissionUpload(REFERENCE_ID, instance)
-statusValues = models.StatusValues(REFERENCE_ID, instance)
+DB_VALUES = models.DatabaseValues(REFERENCE_ID, instance)
 
 
 
@@ -213,6 +215,43 @@ if session.session_status():
     if functionality == 'Real-time Mapping':
         st.header('Real-time Mapping')
 
+        method.realtime_mapping()
+        col1_map, col2_map = st.beta_columns([1,1])
+        if col1_map.checkbox('Online Mapping'):
+
+            online_map = st.empty()
+            online_locations = st.empty()
+
+            if internet_on:
+                if 'NaN' in DB_VALUES.get_coordinates():
+                    status_code.set_code('error', 9)
+                else:
+
+                    def schedule_online():
+                        data = DB_VALUES.get_coordinates()
+                        COORDINATES = {
+                        'HOME' : [float(data[1]),float(data[2]),'🟢'],
+                        'BOAT' : [float(data[3]),float(data[4]),'🔵'],
+                        'C-BOT' : [float(data[5]),float(data[6]),'🔴']
+                        }
+                        st.markdown('__NOTE :__ Switching from the mapping to another functionality without properly exiting it may cause the GUI to become unresponsive. Try clicking kill processes. If issue persists, restart the dashboard from the command prompt.')
+                        online_locations.table( pd.DataFrame(COORDINATES, index=['Longitude','Latitude','Marker']))
+                        online_map.pydeck_chart(onlineMap(COORDINATES))
+                        return None
+
+                    schedule.every(2).seconds.do(schedule_online).tag('schedule_online')
+                    while True:
+                        schedule.run_pending()
+                        time.sleep(1)
+            else:
+                st.info('No internet connection detected. Please try using the offline map.')
+
+
+        if col2_map.checkbox('Offline Mapping'):
+            st.info('This feature is still in progress')
+
+
+
 
 
     #======================= FILE UPLOAD ===========================================
@@ -299,6 +338,7 @@ if session.session_status():
 #================================================================================== 
 
 
+    logging.getLogger('schedule').propagate = False
 
 #==================================================================================
 #============================  SCHEDULE FUNCTIONS  ================================
@@ -306,7 +346,7 @@ if session.session_status():
 
 
     def update_values():
-        values = statusValues.get_current_values()
+        values = DB_VALUES.get_status_values()
         quote = "__Battery Status : __"+str(values[1])+" %"
         BATTERY_STATUS.markdown(quote)
         if values[1] != 'NaN':
@@ -328,10 +368,13 @@ if session.session_status():
 
 
     newline(1,sidebar=True)
+    st.sidebar.header('Kill Process')
+    st.sidebar.markdown('___Note :___ Toggeling this may cause the program to break. Only use this in emergency situations.')
     if st.sidebar.checkbox('Kill all processes'):
         method.killProcess()
         schedule.cancel_job(update_values)
         schedule.clear('update_values')
+        schedule.clear('schedule_online')
         st.stop()
 
 

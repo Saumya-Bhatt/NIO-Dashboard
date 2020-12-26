@@ -83,4 +83,4 @@ The v5.0 runs on Python v3.8. To run the application, open command line in _root
 
 ## Work Left
 
-1. Add online and offline mapping feature.
+1. Add offline mapping feature.

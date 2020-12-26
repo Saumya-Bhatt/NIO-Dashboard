@@ -113,15 +113,19 @@ class InstanceManager():
 
 
 
-class StatusValues():
+class DatabaseValues():
 
     def __init__(self, sessionID, instance):
         self.sessionID = sessionID
         self.database = instance.database
         self.address = instance.address
 
-    def get_current_values(self):
+    def get_status_values(self):
         query = 'SELECT * FROM auvstatus WHERE Instance_AUVStatus_ID = ' + str(self.sessionID)
+        return sql_query(address=self.address, database=self.database, query=query, returnVal=True)[0]
+
+    def get_coordinates(self):
+        query = 'SELECT * FROM coordinates WHERE Instance_Cordi_ID = ' + str(self.sessionID)
         return sql_query(address=self.address, database=self.database, query=query, returnVal=True)[0]
 
 
