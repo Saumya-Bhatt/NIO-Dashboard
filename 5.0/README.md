@@ -83,6 +83,4 @@ The v5.0 runs on Python v3.8. To run the application, open command line in _root
 
 ## Work Left
 
-1. Add online and offline mappinf feature.
-2. Add server side panel.
-3. Add dynamic value updates to GUI.
+1. Add online and offline mapping feature.

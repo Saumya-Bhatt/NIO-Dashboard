@@ -63,3 +63,14 @@ class MethodIntro():
         1. Ensure that the GUI and the AUV are on same network.
         2. Open application 'IP Webcam' and enter the IPv4 network URL into below field.
         ''')
+
+    def killProcess(self):
+        st.markdown('''
+        All functions connecting to the server side has been paused. If the dashboard is malfunctioning, press `ctrl + shft + r` to restart the browser. If any problems still persist, try shutting down the serve and start again.
+        \n
+        1. Functionalities which involve connecting to the server side has been paused.
+        2. You can open the consoles but the data displaying there will not be dynamically updated. 
+        3. Last called data would be displayed.
+        \n
+        Toggel the kill process checkbox in the sidebar to restart the processes.
+        ''')

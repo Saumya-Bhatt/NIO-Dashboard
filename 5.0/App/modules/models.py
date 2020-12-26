@@ -74,6 +74,19 @@ class InstanceManager():
         query = 'INSERT INTO auvinstances VALUES (%s,%s,%s)'
         arg = [None,name,key]
         sql_query(address=self.address, database=self.database, query=query, arg=arg)
+
+        query_ = 'SELECT ID FROM auvinstances ORDER BY ID DESC LIMIT 1'
+        id = sql_query(address=self.address, database=self.database, query=query_, returnVal=True)
+
+        query2 = '''INSERT INTO auvstatus VALUES (%s,%s,%s,%s,%s,%s,%s)'''
+        arg2 = [None,'NaN','NaN','NaN','NaN','NaN',id[0][0]]
+        sql_query(address=self.address, database=self.database, query=query2, arg=arg2)
+        query3 = '''INSERT INTO missionfile VALUES (%s, %s, %s, %s, %s)'''
+        arg3 = [None,'NaN', 'NaN', 'NaN', id[0][0]]
+        sql_query(address=self.address, database=self.database, query=query3, arg=arg3)
+        query4 = '''INSERT INTO coordinates VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
+        arg4 = [None,'NaN', 'NaN', 'NaN','NaN', 'NaN', 'NaN', id[0][0]]
+        sql_query(address=self.address, database=self.database, query=query4, arg=arg4)
         return True
 
     def delete_instance(self,id):
@@ -96,6 +109,20 @@ class InstanceManager():
         query = 'DELETE FROM auvinstances'
         sql_query(address=self.address, database=self.database, query=query)
         return None
+
+
+
+
+class StatusValues():
+
+    def __init__(self, sessionID, instance):
+        self.sessionID = sessionID
+        self.database = instance.database
+        self.address = instance.address
+
+    def get_current_values(self):
+        query = 'SELECT * FROM auvstatus WHERE Instance_AUVStatus_ID = ' + str(self.sessionID)
+        return sql_query(address=self.address, database=self.database, query=query, returnVal=True)[0]
 
 
 
@@ -145,8 +172,8 @@ class MissionUpload():
 
 
     def upload(self,file):
-        query = 'INSERT INTO missionfile VALUES (%s, %s, %s, %s, %s)'
-        args = [None, file, str(datetime.datetime.now()), 'UPLOADED', self.sessionID]
+        query = 'UPDATE missionfile SET Uploaded_File = %s, Time_Stamp = %s, Mission_Status = %s WHERE Instance_missionFile_ID = %s'
+        args = [file, str(datetime.datetime.now()), 'UPLOADED', self.sessionID]
         sql_query(address=self.address, database=self.database, query=query, arg=args)
 
 

@@ -6,17 +6,16 @@
 ###################################################
 
 
-
+import schedule
+import time
 import streamlit as st
 import pandas as pd
 
 from modules import models
 from modules.text import StatusCodes, MethodIntro
 from modules.frame import newline, global_sessions, df_mission_file
-
 from functions.Camera import streamVideo
 
-from streamlit_metrics import metric_row
 
 
 
@@ -40,6 +39,10 @@ instance = models.InstanceManager('127.0.0.1','nio_server')
 REFERENCE_ID, AUV_BOT_NAME, AUV_BOT_ID = global_sessions(session, instance)
 
 mission = models.MissionUpload(REFERENCE_ID, instance)
+statusValues = models.StatusValues(REFERENCE_ID, instance)
+
+
+
 
 
 
@@ -54,6 +57,7 @@ def loginInstance():
 
     global AUV_BOT_NAME, AUV_BOT_ID
     st.write("_Generate, set, delete AUV instances from this panel. Dashboard's functionalities cannot be accessed if an instance is not set._")
+
 
 
     #===================== GENERATE INSTANCE =========================================
@@ -75,6 +79,7 @@ def loginInstance():
                 status_code.set_code('error',4)
 
 
+
     #============================ DELETE INSTANCE ======================================
     col4, col5 = st.beta_columns([3,4])
     delAUVInst = col4.text_input('Enter the corresponding ID to remove instance :')
@@ -90,11 +95,13 @@ def loginInstance():
                 status_code.set_code('error',5)
 
 
+
     #================================ ALL INSTANCES RUNNING ================================
     df = pd.DataFrame(instance.get_all_instances(), columns=['ID','AUV Name','AUV Key'])
     number_instances = len(instance.get_all_instances())
     col5.markdown('__All AUV instances running:__ &nbsp&nbsp' + str(number_instances))
     col5.write(df)
+
 
 
     #================================== SET INSTANCE SESSION ================================
@@ -111,6 +118,7 @@ def loginInstance():
             status_code.set_code('success',2)
 
 
+
     #====================================== DELETE INSTANCES ==================================
     newline(1)
     destroyInstances = st.checkbox('⚠️ Destroy all Instances')
@@ -123,9 +131,11 @@ def loginInstance():
             status_code.set_code('info',1)
 
 
+
 instance_expander = st.beta_expander("⚙️ AUV Instance generation and monitoring panel")
 with instance_expander:
     clicked = loginInstance()
+
 
 
 
@@ -136,13 +146,14 @@ with instance_expander:
 #===============================  SIDEBAR  ========================================
 #===============================           ========================================
 #================================================================================== 
-   
+ 
 
 st.sidebar.header('Instance Monitor')
 st.sidebar.markdown('Name : &nbsp&nbsp&nbsp **'+str(AUV_BOT_NAME)+'**')
 st.sidebar.markdown('AUV Key : &nbsp&nbsp **'+str(AUV_BOT_ID)+'**')
 st.sidebar.markdown('ID tracking : &nbsp&nbsp **' + str(REFERENCE_ID) + '**')
 sessionStatus = st.sidebar.empty()
+
 
 
 #==================================================================================
@@ -172,33 +183,30 @@ if st.sidebar.button('Remove current session'):
         status_code.set_code('info',0)
 
 
+
 #==================================================================================
-#===============================  BOT STATUS  =====================================
+#===============================  VALUE STATUS  ===================================
 #==================================================================================
 
+
+col1, col2 = st.beta_columns([1,2])
 if session.session_status():
     newline(1, sidebar=True)
-    battery = 72
-    quote = "Battery Status : "+str(battery)+" %"
-    st.sidebar.markdown(quote)
-    st.sidebar.progress(battery)
-    metric_row(
-        {
-            "Roll": 100,
-            "Pitch": 200,
-            "Yaw": 300,
-            "Depth": '400 m',
-        }
-    )
+    BATTERY_STATUS = col1.empty()
+    BATTERY_STATUS_PG = col1.empty()
+    STATUS_VALUES = col2.empty()
+
 
 
 #==================================================================================
 #=========================  FUNCTIONALITIES  ======================================
 #==================================================================================
 
+
     st.sidebar.header('Navigation')
     functionality = st.sidebar.selectbox('Select functionality to open console',
                     ('None','Real-time Mapping','Mission File Upload','Onboard Camera Feed'))
+
 
 
     #====================== MAPPING ================================================
@@ -206,9 +214,9 @@ if session.session_status():
         st.header('Real-time Mapping')
 
 
+
     #======================= FILE UPLOAD ===========================================
     elif functionality == 'Mission File Upload':
-
 
         st.header('Mission File Upload')
         method.MissionFileUpload()
@@ -265,9 +273,9 @@ if session.session_status():
 
         st.header('Onboard Camera Feed')
         method.OnboardCamera()
-
         URL = st.text_input('Enter Network URL below [eg.  192.168.43.121:8080] :')
         if st.button('Generate live feed stream'):
+
             try:
                 streamVideo(URL)
                 status_code.set_code('success',5)
@@ -275,5 +283,66 @@ if session.session_status():
                 method.MissionFileUpload()
 
 
+
     else:
         pass
+
+
+
+
+
+
+#==================================================================================
+#===========================                     ==================================
+#=========================== SCHEDULE PROCESSES  ==================================
+#===========================                     ==================================
+#================================================================================== 
+
+
+
+#==================================================================================
+#============================  SCHEDULE FUNCTIONS  ================================
+#==================================================================================
+
+
+    def update_values():
+        values = statusValues.get_current_values()
+        quote = "__Battery Status : __"+str(values[1])+" %"
+        BATTERY_STATUS.markdown(quote)
+        if values[1] != 'NaN':
+            BATTERY_STATUS_PG.progress(int(values[1]))
+
+        frame = {
+        'ROLL' : [values[2]],
+        'PITCH' : [values[3]],
+        'YAW' : [values[4]],
+        'DEPTH' : [values[5]]
+        }
+        STATUS_VALUES.table(frame)
+
+
+
+#==================================================================================
+#============================  KILL PROCESS  ======================================
+#==================================================================================
+
+
+    newline(1,sidebar=True)
+    if st.sidebar.checkbox('Kill all processes'):
+        method.killProcess()
+        schedule.cancel_job(update_values)
+        schedule.clear('update_values')
+        st.stop()
+
+
+    
+#==================================================================================
+#============================  SCHEDULING THREAD  =================================
+#==================================================================================
+
+
+    schedule.every(2).seconds.do(update_values).tag('update_values')
+
+    while True: 
+        schedule.run_pending() 
+        time.sleep(1)
