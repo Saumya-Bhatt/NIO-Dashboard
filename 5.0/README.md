@@ -1,6 +1,6 @@
 # NIO Dashboard v5.0
 
-__Note :__ _The mapping functionalities and dynamic updates are still in work_
+__Note :__ _The offline mapping functionality is still in work_
 
 1. The 5.0 version has the capability to support and connect to multiple AUVs from a single dashboard panel. Once finished, it would be having the same functionalities as that of previous versions plus 1,2 additions.
 2. It runs on streamlit v0.70.0 which unlike the v0.65.0 used in 4.0 is faster and provide better UI/UX and reduces number of code lines significantly.
@@ -80,7 +80,3 @@ The v5.0 runs on Python v3.8. To run the application, open command line in _root
 3. Once everything is set up, run the following command to start the GUI. It will automatically open up in a browser and also give the local and network URL on which it is running.
 
     $ streamlit run app.py
-
-## Work Left
-
-1. Add offline mapping feature.
