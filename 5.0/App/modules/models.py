@@ -7,6 +7,8 @@ import os
 
 
 
+
+
 class SessionManager():
     live = False
 
@@ -48,7 +50,8 @@ class SessionManager():
 
 
 
-    
+
+
 class InstanceManager():
 
     def __init__(self, address, database):
@@ -113,6 +116,7 @@ class InstanceManager():
 
 
 
+
 class DatabaseValues():
 
     def __init__(self, sessionID, instance):
@@ -127,6 +131,7 @@ class DatabaseValues():
     def get_coordinates(self):
         query = 'SELECT * FROM coordinates WHERE Instance_Cordi_ID = ' + str(self.sessionID)
         return sql_query(address=self.address, database=self.database, query=query, returnVal=True)[0]
+
 
 
 

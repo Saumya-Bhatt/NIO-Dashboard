@@ -4,7 +4,7 @@ import numpy as np
 
 #url = 'http://192.168.43.175:8080/shot.jpg'
 
-def streamVideo(url_inp):
+def stream_video(url_inp):
 
     url = 'http://' + url_inp + '/shot.jpg'
     while True:

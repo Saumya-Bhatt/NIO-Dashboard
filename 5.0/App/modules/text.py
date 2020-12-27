@@ -1,6 +1,9 @@
 import streamlit as st
 
 
+
+
+
 class StatusCodes():
 
     def __init__(self, element):
@@ -53,12 +56,14 @@ class StatusCodes():
 
 
 
+
+
 class MethodIntro():
 
-    def MissionFileUpload(self):
+    def mission_file_upload(self):
         st.markdown('Upload your mission files to the server via this panel and moniter their status. Given below is a list of all the mission files currently available on server.')
 
-    def OnboardCamera(self):
+    def onboard_camera(self):
         st.markdown('''
         This feature uses a 3rd-party application to run. Follow the steps given below : \n
         1. Ensure that the GUI and the AUV are on same network.
@@ -69,7 +74,7 @@ class MethodIntro():
         st.markdown('Real-time updated mapping functionality with offline and online accessability. Coordinates given in lat-long in the table.')
 
 
-    def killProcess(self):
+    def kill_process(self):
         st.markdown('''
         All functions connecting to the server side has been paused. If the dashboard is malfunctioning, press `ctrl + shft + r` to restart the browser. If any problems still persist, try shutting down the serve and start again from the command prompt.
         \n

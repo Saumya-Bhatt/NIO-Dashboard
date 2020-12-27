@@ -2,7 +2,7 @@ import pandas as pd
 import pydeck as pdk
 
 
-def onlineMap(COORDINATES):
+def online_map(COORDINATES):
     
     home = pd.DataFrame(data=[COORDINATES['HOME'][0], COORDINATES['HOME'][1]])
     boat = pd.DataFrame(data=[COORDINATES['BOAT'][0], COORDINATES['BOAT'][1]])
