@@ -17,16 +17,19 @@
 import schedule
 import logging
 import time
+import os
 
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 from modules import models
 from modules.text import StatusCodes, MethodIntro
-from modules.frame import newline, global_sessions, df_mission_file
+from modules.frame import newline, global_sessions, df_mission_file, location_frame
 
 from functions.Camera import stream_video
-from functions.Maps import online_map
+from functions.Maps import online_map, generate_coordinates, setup_offline_map
 
 
 
@@ -77,7 +80,7 @@ db_values = models.DatabaseValues(REFERENCE_ID, instance)
 
 def login_instance():
 
-    global AUV_BOT_NAME, AUV_BOT_ID
+    global AUV_BOT_NAME, AUV_BOT_ID, REFERENCE_ID, instance, db_values, mission
     st.write("_Generate, set, delete AUV instances from this panel. Dashboard's functionalities cannot be accessed if an instance is not set._")
 
 
@@ -162,8 +165,13 @@ def login_instance():
             status_code.set_code('error',3)
         else:
             val = instance.get_instance(set_instance)
+
             AUV_BOT_NAME = val[0][1]
             AUV_BOT_ID = val[0][2]
+            REFERENCE_ID = set_instance
+            mission = models.MissionUpload(REFERENCE_ID, instance)
+            db_values = models.DatabaseValues(REFERENCE_ID, instance)
+            
             session.create_session(set_instance)
             status_code.set_code('success',2)
 
@@ -302,36 +310,79 @@ if session.session_status():
 
         #=========================== ONLINE MAPPING ===========================================
 
-        if col1_map.checkbox('Online Mapping'):
+        # if col1_map.checkbox('Online Mapping'):
 
-            st.markdown('__NOTE :__ Switching from the mapping to another functionality without properly exiting it may cause the GUI to become unresponsive. Try clicking kill processes. If issue persists, restart the dashboard from the command prompt.')
-            online_map = st.empty()
-            online_locations = st.empty()
+        #     st.markdown('__NOTE :__ Switching from the mapping to another functionality without properly exiting it may cause the GUI to become unresponsive. Try clicking kill processes. If issue persists, restart the dashboard from the command prompt.')
+        #     online_map = st.empty()
+        #     online_locations = st.empty()
 
-            if 'NaN' in db_values.get_coordinates():
-                status_code.set_code('error', 9)
-            else:
-                def schedule_online():
-                    data = db_values.get_coordinates()
-                    COORDINATES = {
-                    'HOME' : [float(data[1]),float(data[2]),'🟢'],
-                    'BOAT' : [float(data[3]),float(data[4]),'🔵'],
-                    'C-BOT' : [float(data[5]),float(data[6]),'🔴']
-                    }
-                    online_locations.table( pd.DataFrame(COORDINATES, index=['Longitude','Latitude','Marker']))
-                    online_map.pydeck_chart(online_map(COORDINATES))
-                    return None
+        #     if 'NaN' in db_values.get_coordinates():
+        #         status_code.set_code('error', 9)
+        #     else:
+        #         def schedule_online():
+        #             locations, frame = location_frame(db_values.get_coordinates())
+        #             online_locations.table(frame)
+        #             online_map.pydeck_chart(online_map(locations))
+        #             return None
 
-                schedule.every(LATENCY).seconds.do(schedule_online).tag('schedule_online')
-                while True:
-                    schedule.run_pending()
-                    time.sleep(LATENCY)
+        #         schedule.every(LATENCY).seconds.do(schedule_online).tag('schedule_online')
+        #         while True:
+        #             schedule.run_pending()
+        #             time.sleep(LATENCY)
+
 
 
         #=================================== OFFLINE MAPPING ===============================
 
-        if col2_map.checkbox('Offline Mapping'):
-            st.info('This feature is still in progress')
+        # if col2_map.checkbox('Offline Mapping'):
+
+        col1, col2 = st.beta_columns([1,1])
+        _REFLOC = col1.file_uploader('Enter a reference location file', type='txt', key='refloc')
+        _MAP_BG = col2.file_uploader('Choose an image file', type='png', key='map_bg')
+
+
+        if 'NaN' in db_values.get_coordinates():
+            status_code.set_code('error',9)
+        else:
+
+            if _REFLOC is None:
+                st.warning('Please upload a REFLOC file first')
+            else:
+                if _MAP_BG is None:
+                    st.warning('Please upload an image file first')
+                else:
+                    if os.path.exists('./buffer.png'):
+                        os.remove('./buffer.png')
+                    else:
+
+                        offline_locations = st.empty()
+                        offline_map = st.empty()
+                        meta_data, map_array, bounding_box = setup_offline_map(_REFLOC, _MAP_BG)
+
+                        def schedule_offline():
+
+                            global LATENCY, meta_data, map_array, bounding_box
+                            fig = plt.figure()
+                            ax = fig.add_subplot()
+
+                            locations, frame = location_frame(db_values.get_coordinates())
+                            offline_locations.table(frame)
+                            latitude, longitude = generate_coordinates(locations, meta_data)
+
+                            ax.scatter(latitude[0],longitude[0],color='green',s=20, label='home position')
+                            ax.scatter(latitude[1],longitude[1],color='blue',s=20, label='boat position')
+                            ax.scatter(latitude[2],longitude[2],color='red',s=20, label='c-bot position')
+                            ax.imshow(map_array,extent=bounding_box,cmap='gray')
+
+                            plt.legend(loc=2)
+                            offline_map.pyplot(fig)
+                            time.sleep(LATENCY + 1)
+                            plt.close()
+
+                        schedule.every(LATENCY).seconds.do(schedule_offline).tag('schedule_offline')
+                        while True: 
+                            schedule.run_pending() 
+                            time.sleep(LATENCY)
 
 
 
@@ -432,7 +483,6 @@ if session.session_status():
 #===========================                     ==================================
 #================================================================================== 
 #==================================================================================
-
 
 
     logging.getLogger('schedule').propagate = False

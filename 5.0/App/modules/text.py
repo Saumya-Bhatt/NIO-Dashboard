@@ -28,7 +28,7 @@ class StatusCodes():
         'Session instance running!',
         'File compiled and uploaded successufully',
         'Specified Mission File is Running',
-        'Live video stream is running on new window'
+        'Live video stream is running on new window',
     ]
 
     warning_codes = [

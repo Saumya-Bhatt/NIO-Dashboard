@@ -61,5 +61,16 @@ def global_sessions(session, instance):
     return [None, None, None]
 
 
+
 def df_mission_file(mission):
     return pd.DataFrame(mission.get_missions(), columns=['ID','Mission','Timestamp','Status','Inst'])
+
+
+
+def location_frame(data):
+    COORDINATES = {
+        'HOME' : [float(data[1]),float(data[2]),'🟢'],
+        'BOAT' : [float(data[3]),float(data[4]),'🔵'],
+        'C-BOT' : [float(data[5]),float(data[6]),'🔴']
+    }
+    return COORDINATES, pd.DataFrame(COORDINATES, index=['Latitude','Longitude', 'Marker'])
