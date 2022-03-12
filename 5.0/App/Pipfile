@@ -10,7 +10,7 @@ streamlit = "==0.70.0"
 matplotlib = "==3.3.2"
 pydeck = "==0.5.0"
 opencv-python = "==4.4.0.46"
-pillow = "==8.0.1"
+pillow = "==9.0.1"
 schedule = "==0.6.0"
 utm = "==0.6.0"
 
