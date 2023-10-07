@@ -10,7 +10,7 @@
 4. Has ability to provide live streaming videos. (v4.0 and above only)
 5. Work done in version wise.
 
-!['The latest 5.0 version with improved UI for offline imaging and video streaming'](./Extra/Images/landing_page.png)
+!['The latest 5.0 version with improved UI for offline imaging and video streaming'](<Extra/Images/landing_page.png>)
 
 ---
 
@@ -29,7 +29,7 @@
 2. Can dynamically update values.
 3. Live camera feed functionality.
 
-!['Onffline mapping in v4.0'](./Extra/Images/dashboard_python2.png)
+!['Onffline mapping in v4.0'](<Extra/Images/dashboard_python2.png>)
 
 ---
 
@@ -57,7 +57,7 @@ The .sql file can only work with __phpmyadmin__. The schema here is used for v3.
 1. for versions 1.0 to 3.0 has a dashboard and a pannel. The pannel can be assumed to the server side which can send the data (in this case, you can manully send data to the dashboard and see it get updated in realtime).
 2. The 5.0 and 4.0 version only has one app.py file which runs everything. The server side has not been made here as data can easily transfered to it since the boilerplate has been written in python. To run it, go to the directory where app.py is located in _4.0/APP/_ and _5.0/App/_ respectively. Open the command line and type `streamlit run app.py` after going through the setup in their README.
 
-!['The latest build of Dashboard working on HTML/CSS/JS/PHP i.e v3.0'](./Extra/Images/dashboard_javascript.png)
+!['The latest build of Dashboard working on HTML/CSS/JS/PHP i.e v3.0'](<Extra/Images/dashboard_javascript.png>)
 
 ---
 
@@ -71,7 +71,7 @@ The .sql file can only work with __phpmyadmin__. The schema here is used for v3.
 
 ___Note:___ Corrupt version (in folder Extra) works on version 2.0 and has it's capabilities. Not suitable tho as files are not organized efficiently.
 
-!['The builds before 4.0 have a receiving pannel with them to simulate the realtime functionalities of the dashboard and perform to and fro communications'](./Extra/Images/server_panel.png)
+!['The builds before 4.0 have a receiving pannel with them to simulate the realtime functionalities of the dashboard and perform to and fro communications'](<Extra/Images/server_panel.png>)
 
 ### A few details about stable build 4.0
 
